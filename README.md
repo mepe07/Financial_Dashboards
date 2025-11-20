@@ -24,3 +24,6 @@ Licenciatura em Engenharia de Sistemas Informáticos (*regime pós-laboral*) 202
 ### executar a aplicação 
 
 ... completar
+
+
+git clone https://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@github.com/IPCALESI2526/n-37.git
