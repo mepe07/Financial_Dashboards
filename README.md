@@ -5,13 +5,12 @@
 
 Licenciatura em Engenharia de Sistemas Informáticos (*regime pós-laboral*) 2025-26
 
-## grupo  *99*
-| #      | Número  | Nome |
-| -----  | -----   | ---- |
-| _A1_   | ...     | ...  |
-| _A2_   | ...     | ...  |
-| _A3_   | ...     | ...  |
-| _A4_   | ...     | ...  |
+## Grupo  *37*
+| #      | Número  | Nome            | 
+| -----  | -----   | ----            |
+| _A1_   | 29382   | Alexandre Silva |
+| _A2_   | 29383   | Pedro Mendes    |
+
 
 ## organização 
 
