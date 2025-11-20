@@ -23,4 +23,4 @@ Licenciatura em Engenharia de Sistemas Informáticos (*regime pós-laboral*) 202
 
 ### executar a aplicação 
 
-... completar 
+... completar
