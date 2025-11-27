@@ -9,3 +9,4 @@ Módulos disponíveis:
 - (Futuramente) `dashboard`: Responsável pelos gráficos.
 """
 
+from .leitura_ps2 import ler_ficheiro_ps2
