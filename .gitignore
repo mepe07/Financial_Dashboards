@@ -1,0 +1,17 @@
+# Ignore files auto-created by Python
+__pycache__/
+*.pyc
+
+# Ignore venv
+venv/
+env/
+.env
+
+# Ignore files created by the OS 
+.DS_Store
+.directory
+*~
+
+# Ignores data folder (If wanted)
+# data/
+
