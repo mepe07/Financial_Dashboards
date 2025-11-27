@@ -1,4 +1,4 @@
-from src import ler_ficheiro_ps2
+from src import ler_ficheiro_ps2, validar_dados
 import sys
 
 def main():
@@ -9,9 +9,11 @@ def main():
         # Chamar função em leitura_ps2.py
         lista_dados = ler_ficheiro_ps2(nome_ficheiro)
 
-        for entrada in lista_dados:
-            print()
-            print(entrada)
+        dados_validados = validar_dados(lista_dados)
+
+        #for entrada in lista_dados:
+        #    print()
+        #    print(entrada)
 
     except FileNotFoundError as e:
         print(f"Ficheiro não encontrado: {e}")
