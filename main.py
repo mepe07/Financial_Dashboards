@@ -9,6 +9,7 @@ def main():
         # Chamar função em leitura_ps2.py
         lista_dados = ler_ficheiro_ps2(nome_ficheiro)
 
+
         for entrada in lista_dados:
             print()
             print(entrada)

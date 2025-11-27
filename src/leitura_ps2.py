@@ -69,7 +69,8 @@ def ler_ficheiro_ps2(nome_ficheiro):
                 dados_linha["Data"] = linha[1:9] 
                 dados_linha["Entidade"] = linha[9:39].strip()
                 dados_linha["NIF entidade"] = linha[39:48]
-                dados_linha["Nº conta"] = linha[48:].strip()
+                dados_linha["Valor total"] = linha[48:62]
+                dados_linha["Qtd Transações"] = linha[62:].strip()
 
             elif tipo_registo == "2":
                 # Transação
@@ -80,8 +81,9 @@ def ler_ficheiro_ps2(nome_ficheiro):
                 dados_linha["Descrição"] = linha[55:].strip()
 
 
-            # elif tipo_registo == "9":
-                # Rodapé
+            elif tipo_registo == "9":
+                dados_linha["Valor total"] = linha[1:15]
+                dados_linha["Qtd Transações"] = linha[15:].strip()
 
 
             # Adicionar o dicionario à lista
