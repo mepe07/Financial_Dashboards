@@ -66,24 +66,33 @@ def ler_ficheiro_ps2(nome_ficheiro):
 
             if tipo_registo == "1":
                 # Cabeçalho
-                dados_linha["Data"] = linha[1:9] 
-                dados_linha["Entidade"] = linha[9:39].strip()
-                dados_linha["NIF entidade"] = linha[39:48]
-                dados_linha["Valor total"] = linha[48:62]
-                dados_linha["Qtd Transações"] = linha[62:].strip()
+                dados_linha.update ({
+                    "Data" : linha[1:9],
+                    "Entidade" : linha[9:39].strip(),
+                    "NIF entidade" : linha[39:48],
+                    "Valor total" : linha[48:62],
+                    "Qtd Transações" : linha[62:].strip()
+                })
+               
 
             elif tipo_registo == "2":
                 # Transação
-                dados_linha["Tipo operação"] = linha[1:8]
-                dados_linha["Nº operação"] = linha[8:11]
-                dados_linha["IBAN"] = "PT"+linha[11:41]
-                dados_linha["Valor"] = linha[41:55]
-                dados_linha["Descrição"] = linha[55:].strip()
+                dados_linha.update ({
+                    "Tipo operação" : linha[1:8],
+                    "Nº operação" : linha[8:11],
+                    "IBAN" : "PT"+linha[11:41],
+                    "Valor" : linha[41:55],
+                    "Descrição" : linha[55:].strip()
+                })
+                
 
 
             elif tipo_registo == "9":
-                dados_linha["Valor total"] = linha[1:15]
-                dados_linha["Qtd Transações"] = linha[15:].strip()
+                dados_linha.update ({
+                    "Valor total" : linha[1:15],
+                    "Qtd Transações" : linha[15:].strip()
+                })
+                
 
 
             # Adicionar o dicionario à lista

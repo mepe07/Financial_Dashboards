@@ -10,9 +10,17 @@ def main():
         lista_dados = ler_ficheiro_ps2(nome_ficheiro)
 
 
-        for entrada in lista_dados:
-            print()
-            print(entrada)
+        # for entrada in lista_dados:
+        #     print()
+        #     print(entrada)
+
+        for registo in lista_dados:
+            print("NOVO REGISTO")
+            print("")
+
+            for chave, valor in registo.items():
+                print(f"{chave}: {valor}")
+                print("")
 
     except FileNotFoundError as e:
         print(f"Ficheiro não encontrado: {e}")

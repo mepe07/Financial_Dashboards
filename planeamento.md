@@ -15,14 +15,16 @@ Licenciatura em Engenharia de Sistemas Informáticos (*regime pós-laboral*) 202
 
 ### Semana 1 - [17.nov a 21.nov] 
 
-> leitura de ficheiros .ps2 na pasta `./data`
-> validar se conteúdo do ficheiro respeita a formatação ps2
-> validar nifs e NIBs (seguem as regras) 
+> Distribuíção de tarefas
+> Análise do ficheiro PS2 para compreensão do formato
+> Criação do repositório
+> Estruturação inicial do projeto
 
-| #      | Branch            | Descrição da Tarefa |
-| -----  | -----------       | ---- |
-| _A1_   | feature-leitura   | ........  |
-| _A2_   | feature-validacao | ...  |
+
+| #      | Branch  | Descrição da Tarefa |
+| -----  | ------  | ---- |
+| _A1_   | ...     | ........  |
+| _A2_   | ...     | ...  |
 | _A3_   | ...     | ...  |
 | _A4_   | ...     | ...  |
 
@@ -31,6 +33,10 @@ Licenciatura em Engenharia de Sistemas Informáticos (*regime pós-laboral*) 202
 
 
 ## Semana 2 - [24.nov a 28.nov] 
+
+> Implementação da leitura de ficheiros .ps2 presentes na pasta `./data`
+> validar se conteúdo do ficheiro respeita a formatação ps2
+> validar nifs e NIBs (seguem as regras) 
 
 | #      | Branch  | Descrição da Tarefa |
 | -----  | -----   | ---- |
