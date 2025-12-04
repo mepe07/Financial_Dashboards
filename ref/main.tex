@@ -1,0 +1,93 @@
+\documentclass[12pt, a4paper]{article}
+
+% --- PACOTES ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+\usepackage{graphicx}      % Para imagens
+\usepackage{geometry}      % Para margens
+\usepackage{setspace}      % Para espaçamento entre linhas
+\usepackage{mathptmx}      % Usa a fonte Times New Roman (padrão académico)
+
+% Configuração das Margens (Padrão ABNT/Universitário)
+\geometry{
+    top=3cm,
+    bottom=2cm,
+    left=3cm,
+    right=2cm
+}
+
+\begin{document}
+
+% --- INÍCIO DA CAPA ---
+\begin{titlepage}
+    \centering % Tudo centrado
+    
+    % 1. NOME DA INSTITUIÇÃO (Em maiúsculas e negrito)
+    {\scshape\LARGE Instituto Politécnico do Cávado e do Ave \par}
+    {\scshape\Large Escola Superior de Tecnologia \par}
+    
+    \vspace{1cm} % Espaço vertical
+    
+    % 2. LOGÓTIPO
+    % Se tiver o seu logo, use: \includegraphics[width=0.4\textwidth]{logo.png}
+    % Por enquanto, uso 'example-image' para testar
+    \includegraphics[width=0.4\textwidth]{logo.png}
+    
+    \vspace{1.5cm}
+    
+    % 3. CURSO E DISCIPLINA
+    {\large \textbf{Licenciatura em Engenharia de Sistemas Informática} \par}
+    {\large Unidade Curricular: Laboratórios de Informática \par}
+    
+    \vspace{3cm} % Espaço grande até o título
+    
+    % 4. TÍTULO DO TRABALHO
+    % A regra cria uma linha horizontal bonita
+    \rule{\linewidth}{0.5mm} \\[0.4cm]
+    {\huge \bfseries Processamento e Análise de \par Ficheiros PS2 \par}
+    \rule{\linewidth}{0.5mm} \\[0.5cm]
+    
+    {\Large \itshape Relatório Técnico}
+    
+    \vfill % Empurra o resto para o fundo da página
+    
+    % 5. AUTORES E ORIENTADOR
+    \begin{minipage}{0.45\textwidth}
+        \begin{flushleft} \large
+            \textbf{Elaborado por:}\\
+            Alexandre Silva (A29382)\\
+            Pedro Mendes (A29383)
+        \end{flushleft}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+        \begin{flushright} \large
+            \textbf{Orientado por:} \\
+            Prof. Óscar Ribeiro
+        \end{flushright}
+    \end{minipage}
+    
+    \vspace{2cm}
+    
+    % 6. LOCAL E DATA
+    {\large \textbf{Barcelos} \\ \today}
+    
+\end{titlepage}
+% --- FIM DA CAPA ---
+
+% Começa uma nova página para o conteúdo
+\newpage
+
+% Índice Automático
+\tableofcontents
+\newpage
+
+% --- O SEU CONTEÚDO COMEÇA AQUI ---
+\section{Introdução}
+O presente relatório visa documentar o desenvolvimento de uma ferramenta em Python capaz de processar ficheiros com extensão \texttt{.ps2}...
+
+\section{Estrutura do Projeto}
+O projeto encontra-se organizado segundo o padrão MVC...
+
+\end{document}

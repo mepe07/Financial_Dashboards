@@ -15,3 +15,16 @@ env/
 # Ignores data folder (If wanted)
 # data/
 
+# LaTex
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+# Remover mais tarde se quiser enviar o pdf para o Git
+*.pdf
+ref/*.png
