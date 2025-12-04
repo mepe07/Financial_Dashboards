@@ -22,7 +22,7 @@ Licenciatura em Engenharia de Sistemas Informáticos (*regime pós-laboral*) 202
 | #      | Branch            | Descrição da Tarefa |
 | -----  | -----------       | ---- |
 | _A1_   | feature-leitura   | ........  |
-| _A2_   | feature-validacao | ...  |
+| _A2_   | feature-Teste | ...  |
 | _A3_   | ...     | ...  |
 | _A4_   | ...     | ...  |
 
