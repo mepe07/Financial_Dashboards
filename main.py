@@ -1,4 +1,5 @@
 from src import ler_ficheiro_ps2
+from src import converterParaPandas
 import sys
 
 def main():
@@ -9,18 +10,30 @@ def main():
         # Chamar função em leitura_ps2.py
         lista_dados = ler_ficheiro_ps2(nome_ficheiro)
 
+        df_Pandas = converterParaPandas(lista_dados)
+        df_cabecalho = df_Pandas["cabecalho"]
+        df_movimentos = df_Pandas["movimentos"]
+        df_rodape = df_Pandas["rodape"]
 
-        # for entrada in lista_dados:
-        #     print()
-        #     print(entrada)
+        print(df_cabecalho)
+        print()
+        print(df_movimentos)
+        print()
+        print(df_rodape)
 
-        for registo in lista_dados:
-            print("NOVO REGISTO")
-            print("")
 
-            for chave, valor in registo.items():
-                print(f"{chave}: {valor}")
-                print("")
+        # print("--- Tipos de Dados (Verificação) ---")
+        # print(df_cabecalho.dtypes)
+        
+
+        # #Teste do leitura_ps2.py
+        # for registo in lista_dados:
+        #     print("NOVO REGISTO")
+        #     print("")
+
+        #     for chave, valor in registo.items():
+        #         print(f"{chave}: {valor}")
+        #         print("")
 
     except FileNotFoundError as e:
         print(f"Ficheiro não encontrado: {e}")

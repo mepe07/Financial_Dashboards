@@ -24,6 +24,8 @@ def obter_path_data():
     path_data = raiz_projeto / 'data'
     return path_data
 
+
+
 def ler_ficheiro_ps2(nome_ficheiro):
     """
     Lê um ficheiro .ps2 e converte o seu conteúdo num dicionário.
