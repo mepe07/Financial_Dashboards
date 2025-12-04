@@ -15,6 +15,18 @@ def main():
         #    print()
         #    print(entrada)
 
+        # for entrada in lista_dados:
+        #     print()
+        #     print(entrada)
+
+        for registo in lista_dados:
+            print("NOVO REGISTO")
+            print("")
+
+            for chave, valor in registo.items():
+                print(f"{chave}: {valor}")
+                print("")
+
     except FileNotFoundError as e:
         print(f"Ficheiro não encontrado: {e}")
     except Exception as e:
