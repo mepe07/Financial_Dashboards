@@ -1,12 +1,11 @@
 import doctest
 from datetime import datetime
-from decimal import Decimal, InvalidOperation # Usar Decimal para precisão monetária
+from decimal import Decimal, InvalidOperation 
 
-# --- CONSTANTES E FUNÇÕES AUXILIARES DE NIF (SEM ALTERAÇÕES) ---
-
+# --- FUNÇÕES AUXILIARES DE NIF/IBAN (Inalteradas) ---
 DIGITOS_CONTROLO = 8 
 DIGITOS_NIF = 9
-# ... (Funções calcular_digito_controlo e valida_nif inalteradas)
+
 def calcular_digito_controlo(digitos: str) -> str:
     """Calcula o digito de controle de um NIF."""
     if not digitos.isdigit():
@@ -34,15 +33,47 @@ def valida_nif(nif: str) -> bool:
         return False
     return nif[-1] == calcular_digito_controlo(nif[:DIGITOS_CONTROLO])
 
+TAMANHOS_IBAN = {
+    'PT': 25, 'DE': 22, 'ES': 24, 'FR': 27,
+}
 
-# --- FUNÇÃO PRINCIPAL DE VALIDAÇÃO (COM VALIDAÇÃO DE CONSISTÊNCIA DE VALOR) ---
+def valida_iban(iban: str) -> bool:
+    """Valida um IBAN usando o algoritmo Modulo 97-10."""
+    iban = iban.replace(' ', '').upper()
+    if len(iban) < 4:
+        return False
+    codigo_pais = iban[:2]
+    comprimento_esperado = TAMANHOS_IBAN.get(codigo_pais)
+    if comprimento_esperado and len(iban) != comprimento_esperado:
+        return False
+    elif not comprimento_esperado and not (15 <= len(iban) <= 34):
+        return False
+    iban_reorganizado = iban[4:] + iban[:4]
+    def letra_para_digito(char):
+        if 'A' <= char <= 'Z':
+            return str(ord(char) - ord('A') + 10)
+        return char
+    iban_digitalizado = "".join(letra_para_digito(c) for c in iban_reorganizado)
+    try:
+        resto = 0
+        for i in range(0, len(iban_digitalizado), 7):
+            chunk = iban_digitalizado[i:i + 7]
+            resto = int(str(resto) + chunk) % 97
+        return resto == 1
+    except ValueError:
+        return False
 
-def validar_dados(lista_dados: list) -> list:
+
+# --- FUNÇÃO PRINCIPAL DE VALIDAÇÃO ---
+
+def validar_dados(lista_dados: list) -> int:
     """
-    Recebe a lista de dados e valida cada entrada.
-    Inclui o cálculo da soma dos campos 'Valor' (Tipo 2) para validar o 'Valor total' (Tipo 1).
+    Recebe a lista de dados, valida-os e retorna um inteiro:
+    1 se o ficheiro for totalmente válido, 0 caso contrário.
     """
-    dados_validos = []
+    
+    # VARIÁVEL DE ESTADO DE VALIDADE
+    ficheiro_valido = True
     
     agora = datetime.now()
     ano_atual = agora.year
@@ -52,75 +83,103 @@ def validar_dados(lista_dados: list) -> list:
     print(f"Data do Sistema: {ano_atual} (Mês: {mes_atual})")
 
     # -----------------------------------------------------
-    # --- 1. VALIDAÇÃO ESTRUTURAL (CONTAGEM DE TIPOS E CÁLCULO DA SOMA REAL) ---
+    # --- 1. PASSO DE PRÉ-PROCESSAMENTO E SOMA ---
     # -----------------------------------------------------
     
     contadores_tipo = {'1': 0, '2': 0, '9': 0}
     soma_real_valor = Decimal(0)
     erros_tipo2_valor = False
     
-    # 1.1. Passo de Contagem e SOMA
+    # Variáveis para referência cruzada:
+    mes_base_ficheiro = None 
+    ano_base_ficheiro = None
+    valor_total_tipo1 = None
+    qtd_transacoes_tipo1 = None
+    ultimo_num_operacao_tipo2_str = None 
+
+    # 1.1. Passo de Contagem, SOMA e Extração de Referências
     for i, linha in enumerate(lista_dados):
         tipo = linha.get("Tipo Registo")
         if tipo in contadores_tipo:
             contadores_tipo[tipo] += 1
         
-        # CÁLCULO DA SOMA REAL
+        if tipo == '1':
+            data_str = linha.get("Data", "")
+            if len(data_str) >= 6 and data_str[:6].isdigit():
+                ano_base_ficheiro = data_str[:4]
+                mes_base_ficheiro = data_str[4:6]
+            
+            try:
+                valor_total_tipo1 = Decimal(linha.get("Valor total"))
+            except (TypeError, InvalidOperation):
+                valor_total_tipo1 = None 
+            
+            try:
+                qtd_transacoes_tipo1 = int(linha.get("Qtd Transações"))
+            except (TypeError, ValueError):
+                qtd_transacoes_tipo1 = None
+
         if tipo == '2':
+            # Guarda o Nº Operação (para a última linha)
+            ultimo_num_operacao_tipo2_str = linha.get("Nº operação")
+
             valor_str = linha.get("Valor")
             if valor_str is None:
-                print(f"❌ ERRO Linha {i+1}: Registo Tipo 2 sem campo 'Valor'.")
-                erros_tipo2_valor = True
+                erros_tipo2_valor = True 
             else:
                 try:
-                    # Tenta converter o valor para Decimal para evitar erros de precisão com floats
                     soma_real_valor += Decimal(valor_str)
                 except InvalidOperation:
-                    print(f"❌ ERRO Linha {i+1}: Valor Tipo 2 ('{valor_str}') **não é um número válido**.")
                     erros_tipo2_valor = True
             
-    # Guarda a contagem real de Tipo 2 para uso posterior na validação de conteúdo
     contagem_real_tipo2 = contadores_tipo['2']
             
-    # 1.2. Aplicação das Regras e Prints Estruturais
-    print("\n--- 🏗️ Validação Estrutural (Regras de Contagem e Soma) ---")
-    validacao_estrutural_ok = True
+    # -----------------------------------------------------
+    # --- 2. VALIDAÇÃO ESTRUTURAL ---
+    # -----------------------------------------------------
     
-    # ... (Regras estruturais: 1, 9, 2 inalteradas)
+    print("\n--- 🏗️ Validação Estrutural (Regras de Contagem e Soma) ---")
+    
     if contadores_tipo['1'] != 1:
         print(f"❌ ERRO Estrutural: O registo de **Cabeçalho (Tipo 1)** deve aparecer **exatamente 1 vez**. Encontrado: {contadores_tipo['1']}")
-        validacao_estrutural_ok = False
-    else:
-        print(f"✅ Estrutural: Registo Tipo 1 (Cabeçalho) OK.")
-
+        ficheiro_valido = False
+    
     if contadores_tipo['9'] != 1:
         print(f"❌ ERRO Estrutural: O registo de **Rodapé (Tipo 9)** deve aparecer **exatamente 1 vez**. Encontrado: {contadores_tipo['9']}")
-        validacao_estrutural_ok = False
-    else:
-        print(f"✅ Estrutural: Registo Tipo 9 (Rodapé) OK.")
+        ficheiro_valido = False
 
     if contadores_tipo['2'] < 1:
         print(f"❌ ERRO Estrutural: O registo de **Detalhe (Tipo 2)** deve aparecer **pelo menos 1 vez**. Encontrado: {contadores_tipo['2']}")
-        validacao_estrutural_ok = False
-    else:
-        print(f"✅ Estrutural: Registo Tipo 2 (Detalhe) OK. ({contagem_real_tipo2} encontrados)")
-
+        ficheiro_valido = False
+    
     if erros_tipo2_valor:
         print("❌ ERRO Estrutural: Encontrados erros de formato ou campos em falta nos valores Tipo 2. (Soma de Valor total impossível)")
-        validacao_estrutural_ok = False
+        ficheiro_valido = False
         
-    if not validacao_estrutural_ok:
+    if not ficheiro_valido:
         print("\n🛑 **Validação de Conteúdo Cancelada** devido a erros estruturais.")
-        return []
+        return 0 # Retorna 0 (Falso) imediatamente
+
+    # Validação de data base (crítica para o próximo passo)
+    if mes_base_ficheiro is None or ano_base_ficheiro is None:
+        print("❌ ERRO Estrutural: Impossível extrair Mês/Ano de referência do registo Tipo 1 para validações de detalhe.")
+        return 0
     
     print(f"\n--- Validação Estrutural Concluída. Soma Real dos Valores Tipo 2: **{soma_real_valor}** ---")
+    
+    data_esperada_mm_aaaa = f'{mes_base_ficheiro}/{ano_base_ficheiro}'
+    print(f"ℹ️ Data Base do Ficheiro (Tipo 1) para validações: **{data_esperada_mm_aaaa}**")
+
 
     # -----------------------------------------------------
-    # --- 2. VALIDAÇÃO DE CONTEÚDO (NIF, ANO, CONSISTÊNCIA DE VALOR E QTD) ---
+    # --- 3. VALIDAÇÃO DE CONTEÚDO (POR LINHA) ---
     # -----------------------------------------------------
     
     print("\n--- 📝 Validação de Conteúdo (Por Linha) ---")
     
+    contador_operacoes_tipo2 = 0 
+    descricao_base_tipo2 = None 
+
     for i, linha in enumerate(lista_dados):
         numero_linha = i + 1
         registo_valido = True
@@ -128,98 +187,205 @@ def validar_dados(lista_dados: list) -> list:
 
         # --- VALIDAÇÕES DO CABEÇALHO (TIPO 1) ---
         if tipo == "1":
-            # 1 & 2. NIF e Ano (inalteradas)
+            
+            # 1. NIF
             nif_atual = linha.get("NIF entidade")
             if not valida_nif(nif_atual):
                 print(f"❌ ERRO Linha {numero_linha}: NIF **inválido** -> '{nif_atual}'")
                 registo_valido = False
-            else:
-                print(f"✅ Linha {numero_linha}: NIF Válido.")
 
+            # 2. Ano
             data_str = linha.get("Data", "")
             if len(data_str) >= 4 and data_str[:4].isdigit():
-                ano_ficheiro = int(data_str[:4])
-                if ano_ficheiro == ano_atual:
-                    print(f"✅ Linha {numero_linha}: Ano '{ano_ficheiro}' corresponde ao ano atual.")
-                elif mes_atual == 1 and ano_ficheiro == (ano_atual - 1):
-                    print(f"✅ Linha {numero_linha}: Ano '{ano_ficheiro}' aceite (Tolerância de Janeiro aplicada).")
-                else:
-                    print(f"❌ ERRO Linha {numero_linha}: Ano **incorreto**. Ficheiro: '{ano_ficheiro}', Sistema: '{ano_atual}' (Mês {mes_atual})")
+                ano_ficheiro_int = int(data_str[:4])
+                
+                if not (ano_ficheiro_int == ano_atual or (mes_atual == 1 and ano_ficheiro_int == (ano_atual - 1))):
+                    print(f"❌ ERRO Linha {numero_linha}: Ano **incorreto**. Ficheiro: '{ano_ficheiro_int}', Sistema: '{ano_atual}' (Mês {mes_atual})")
                     registo_valido = False
             else:
                 print(f"❌ ERRO Linha {numero_linha}: Formato de data inválido.")
                 registo_valido = False
 
-            # --- 3. VALIDAÇÃO 'Valor Total' (14 caracteres) e CONSISTÊNCIA DA SOMA ---
+            # 3. Entidade
+            nome_entidade = linha.get("Entidade")
+            LIMITE_CARACTERES = 43
             
+            if nome_entidade is None or str(nome_entidade).strip() == "":
+                print(f"❌ ERRO Linha {numero_linha}: Campo **'Entidade'** em falta ou vazio.")
+                registo_valido = False
+            else:
+                entidade_str = str(nome_entidade)
+                if len(entidade_str) > LIMITE_CARACTERES:
+                    print(f"❌ ERRO Linha {numero_linha}: Campo 'Entidade' tem {len(entidade_str)} caracteres. **Máximo permitido: {LIMITE_CARACTERES}**.")
+                    registo_valido = False
+
+            # 4. Valor Total
             valor_total_str = linha.get("Valor total") 
 
             if valor_total_str is None:
-                print(f"❌ ERRO Linha {numero_linha}: Campo **'Valor total'** em falta.")
                 registo_valido = False
             else:
-                # 3a. Validação de Tamanho
                 num_caracteres = len(str(valor_total_str))
                 TAMANHO_ESPERADO = 14
                 
                 if num_caracteres != TAMANHO_ESPERADO:
-                    print(f"❌ ERRO Linha {numero_linha}: Campo 'Valor total' tem {num_caracteres} caracteres. **Esperado: {TAMANHO_ESPERADO}**.")
                     registo_valido = False
-                else:
-                    print(f"✅ Linha {numero_linha}: (OK) Valor total ({num_caracteres} chars)")
                 
-                # 3b. Validação da Soma (se o campo foi encontrado)
                 try:
                     valor_total_declarado = Decimal(valor_total_str)
                     
                     if valor_total_declarado != soma_real_valor:
                         print(f"❌ ERRO Linha {numero_linha}: Inconsistência do Valor Total. Declarado: {valor_total_declarado}, Calculado (Tipo 2): {soma_real_valor}")
                         registo_valido = False
-                    else:
-                        print(f"✅ Linha {numero_linha}: (OK) Valor total ({soma_real_valor})")
 
                 except InvalidOperation:
                     print(f"❌ ERRO Linha {numero_linha}: Valor total ('{valor_total_str}') **não é um número válido**.")
                     registo_valido = False
 
 
-            # --- 4. VALIDAÇÃO DE CONSISTÊNCIA: Qtd Transações vs. Contagem Real de Tipo 2 (inalterada) ---
-            
+            # 5. Qtd Transações
             qtd_transacoes_str = linha.get("Qtd Transações")
             
             if qtd_transacoes_str is None:
-                print(f"❌ ERRO Linha {numero_linha}: Campo **'Qtd Transações'** em falta.")
                 registo_valido = False
             else:
                 try:
                     qtd_transacoes_declarada = int(qtd_transacoes_str)
 
-                    # REGRA DE CONSISTÊNCIA DE QTD
                     if qtd_transacoes_declarada != contagem_real_tipo2:
                         print(f"❌ ERRO Linha {numero_linha}: Inconsistência na Qtd Transações. Declarado: {qtd_transacoes_declarada}, Real (Tipo 2): {contagem_real_tipo2}")
                         registo_valido = False
-                    else:
-                        print(f"✅ Linha {numero_linha}: (OK) Transações ({contagem_real_tipo2})")
 
                 except ValueError:
                     print(f"❌ ERRO Linha {numero_linha}: Qtd Transações ('{qtd_transacoes_str}') **não é um número inteiro válido**.")
                     registo_valido = False
                     
-        # --- TIPOS 2 e 9 ---
-        elif tipo in ['2', '9']:
-            # Registos Tipo 2 e 9 são aceites aqui, pois a validação de conteúdo do Tipo 2
-            # (formato de valor) já ocorreu na fase de SOMA (Passo 1.1)
-            print(f"ℹ️ Linha {numero_linha}: Tipo de Registo '{tipo}' (Conteúdo aceite).")
+            if not registo_valido:
+                ficheiro_valido = False
+            else:
+                print(f"✅ Linha {numero_linha} (Tipo 1): OK.")
 
 
-        # Se passou em todos os testes, adiciona à lista final
-        if registo_valido:
-            dados_validos.append(linha)
+        # --- VALIDAÇÕES DO DETALHE (TIPO 2) ---
+        elif tipo == '2':
+            
+            # 1. Tipo operação
+            tipo_operacao = linha.get("Tipo operação")
+            if tipo_operacao is None or str(tipo_operacao).strip() == "":
+                print(f"❌ ERRO Linha {numero_linha}: Tipo 2 - Campo **'Tipo operação'** em falta ou vazio.")
+                registo_valido = False
 
-    return dados_validos
+            # 2. Nº operação (Sequência)
+            contador_operacoes_tipo2 += 1
+            num_operacao_str = linha.get("Nº operação")
+            num_operacao_esperado = str(contador_operacoes_tipo2).zfill(3)
+            
+            if num_operacao_str is None or num_operacao_str != num_operacao_esperado:
+                print(f"❌ ERRO Linha {numero_linha}: Tipo 2 - Nº Operação incorreto. Declarado: '{num_operacao_str}', Esperado: '{num_operacao_esperado}' (Sequência).")
+                registo_valido = False
+
+            # 3. IBAN
+            iban_str = linha.get("IBAN")
+            if iban_str is None or str(iban_str).strip() == "" or not valida_iban(iban_str):
+                print(f"❌ ERRO Linha {numero_linha}: Tipo 2 - IBAN **inválido** ou com formato incorreto. ('{iban_str}')")
+                registo_valido = False
+            
+            # 4. VALIDAÇÕES DE DESCRIÇÃO
+            descricao = linha.get("Descrição")
+            if descricao is None:
+                descricao_str = ""
+            else:
+                descricao_str = str(descricao).strip() 
+
+            if descricao_str == "":
+                print(f"❌ ERRO Linha {numero_linha}: Tipo 2 - Campo **'Descrição'** em falta ou vazio.")
+                registo_valido = False
+            else:
+                # 4a. Validação de Uniformidade 
+                if contador_operacoes_tipo2 == 1:
+                    descricao_base_tipo2 = descricao_str
+                elif descricao_str != descricao_base_tipo2:
+                    print(f"❌ ERRO Linha {numero_linha}: Tipo 2 - Descrição inconsistente. Atual: '{descricao_str}', Base: '{descricao_base_tipo2}'")
+                    registo_valido = False
+                
+                # 4b. Validação da Data
+                TAMANHO_DATA_MM_AAAA = 7 
+                data_campo_esperada = f'{mes_base_ficheiro}/{ano_base_ficheiro}' 
+                
+                if len(descricao_str) < TAMANHO_DATA_MM_AAAA or descricao_str[-TAMANHO_DATA_MM_AAAA:] != data_campo_esperada:
+                    data_descricao = descricao_str[-TAMANHO_DATA_MM_AAAA:] if len(descricao_str) >= TAMANHO_DATA_MM_AAAA else "curta"
+                    print(f"❌ ERRO Linha {numero_linha}: Tipo 2 - Data na Descrição inconsistente. Descrição (últimos 7): '{data_descricao}', Esperado: '{data_campo_esperada}' (Data Base Tipo 1).")
+                    registo_valido = False
+
+            if not registo_valido:
+                ficheiro_valido = False
+            else:
+                print(f"✅ Linha {numero_linha} (Tipo 2): OK.")
 
 
-# --- BLOCO DE TESTE (ATUALIZADO PARA INCLUIR O CAMPO 'Valor' NO TIPO 2) ---
+        # --- VALIDAÇÕES DO RODAPÉ (TIPO 9) ---
+        elif tipo == '9':
+            
+            # 1. Validação do Campo "Valor total"
+            valor_total_rodapé_str = linha.get("Valor total")
+            
+            if valor_total_rodapé_str is None:
+                 print(f"❌ ERRO Linha {numero_linha}: Tipo 9 - Campo **'Valor total'** em falta.")
+                 registo_valido = False
+            else:
+                try:
+                    valor_rodapé_declarado = Decimal(valor_total_rodapé_str)
+
+                    # Consistência com o Valor Total do Tipo 1 e Soma Real Tipo 2
+                    if (valor_total_tipo1 is not None and valor_rodapé_declarado != valor_total_tipo1) or \
+                       (valor_rodapé_declarado != soma_real_valor):
+                        print(f"❌ ERRO Linha {numero_linha}: Tipo 9 - Valor total ({valor_rodapé_declarado}) **inconsistente** com Tipo 1 ({valor_total_tipo1}) ou soma Tipo 2 ({soma_real_valor}).")
+                        registo_valido = False
+                        
+                except InvalidOperation:
+                    print(f"❌ ERRO Linha {numero_linha}: Tipo 9 - Valor total ('{valor_total_rodapé_str}') **não é um número válido**.")
+                    registo_valido = False
+
+
+            # 2. Validação do Campo "Qtd Transações"
+            qtd_transacoes_rodapé_str = linha.get("Qtd Transações")
+            
+            if qtd_transacoes_rodapé_str is None:
+                print(f"❌ ERRO Linha {numero_linha}: Tipo 9 - Campo **'Qtd Transações'** em falta.")
+                registo_valido = False
+            else:
+                try:
+                    qtd_rodapé_declarada = int(qtd_transacoes_rodapé_str)
+                    
+                    # 2a. Consistência com Tipo 1 e Contagem Real Tipo 2
+                    if (qtd_transacoes_tipo1 is not None and qtd_rodapé_declarada != qtd_transacoes_tipo1) or \
+                       (qtd_rodapé_declarada != contagem_real_tipo2):
+                        print(f"❌ ERRO Linha {numero_linha}: Tipo 9 - Qtd Transações ({qtd_rodapé_declarada}) **inconsistente** com Tipo 1 ({qtd_transacoes_tipo1}) ou contagem Tipo 2 ({contagem_real_tipo2}).")
+                        registo_valido = False
+                        
+                    # 2b. REQUISITO: Qtd Transações (Tipo 9) vs. Nº Operação da última linha Tipo 2
+                    try:
+                        ultimo_num_operacao_int = int(ultimo_num_operacao_tipo2_str)
+                        if qtd_rodapé_declarada != ultimo_num_operacao_int:
+                             print(f"❌ ERRO Linha {numero_linha}: Tipo 9 - Qtd Transações ({qtd_rodapé_declarada}) **não coincide com o Nº Operação da última linha Tipo 2** ({ultimo_num_operacao_int}).")
+                             registo_valido = False
+                    except (ValueError, TypeError):
+                        pass
+
+                except ValueError:
+                    print(f"❌ ERRO Linha {numero_linha}: Tipo 9 - Qtd Transações ('{qtd_transacoes_rodapé_str}') **não é um número inteiro válido**.")
+                    registo_valido = False
+            
+            if not registo_valido:
+                ficheiro_valido = False
+            else:
+                print(f"✅ Linha {numero_linha} (Tipo 9): OK.")
+
+    # Retorna 1 se todas as validações correram bem, 0 caso contrário.
+    return 1 if ficheiro_valido else 0
+
+
+# --- BLOCO DE TESTE ---
 if __name__ == "__main__":
     
     agora_teste = datetime.now()
@@ -227,60 +393,46 @@ if __name__ == "__main__":
     
     print(f"\n--- A CORRER TESTES (Ano base sistema: {ano_sys}) ---")
     
-    # O valor 14 chars deve incluir um separador decimal se o seu formato o exigir
-    valor_14_chars = '0000010000.00' # 10000.00 - 14 chars OK
-    
     # -----------------------------------------------------
-    # TESTE 5: SUCESSO na Consistência de Qtd E Valor
-    # Detalhes: 10.00, 20.00, 70.00. Soma Real = 100.00 (Declarado '0000000100.00')
-    # Qtd Real = 3 (Declarado '00003')
+    # VARIÁVEIS PARA SUCESSO
     # -----------------------------------------------------
-    print("\n\n#####################################################")
-    print("TESTE 5: CONSISTÊNCIA TOTAL OK (Valor e Qtd)")
-    print("#####################################################")
+    # 2 transações que somam 100.00
+    VALOR_TOTAL_OK = '0000000100.00' 
+    QTD_TRANSACOES_OK = '00002'
     
-    # Soma de 10.00 + 20.00 + 70.00 = 100.00
-    # O Valor Total declarado DEVE ser '0000000100.00' (14 caracteres)
+    entidade_ok = 'TESTE COM DADOS VALIDOS'
     
-    dados_sucesso_total = [
-        # Tipo 1: Declara 3 Transações e 100.00 de Valor
-        {'Tipo Registo': '1', 'Data': f'{ano_sys}1001', 'Entidade': 'Empresa OK', 'NIF entidade': '501442600', 'Valor total': '0000000100.00', 'Qtd Transações': '00003'}, 
-        # Tipo 2 - 1
-        {'Tipo Registo': '2', 'Data': '20250101', 'Entidade': 'Detalhe 1', 'NIF entidade': '999999999', 'Valor': '10.00'}, 
-        # Tipo 2 - 2
-        {'Tipo Registo': '2', 'Data': '20250101', 'Entidade': 'Detalhe 2', 'NIF entidade': '999999999', 'Valor': '20.00'}, 
-        # Tipo 2 - 3
-        {'Tipo Registo': '2', 'Data': '20250101', 'Entidade': 'Detalhe 3', 'NIF entidade': '999999999', 'Valor': '70.00'}, 
-        {'Tipo Registo': '9', 'Data': '20250103', 'Entidade': 'FIM', 'NIF entidade': '999999999'} 
-    ]
+    # IBANs Portugueses Válidos (PT25) que passam no Modulo 97-10
+    IBAN_VALIDO_1 = 'PT50000201021234567890154' 
+    IBAN_VALIDO_2 = 'PT50000700010000000000788' 
     
-    resultado_sucesso_total = validar_dados(dados_sucesso_total)
-    print("\n--- Resultado Final (Teste 5) ---")
-    print(f"Total registos aceites: {len(resultado_sucesso_total)}")
-
+    DATA_TIPO_1 = f'{ano_sys}1001' 
+    DATA_DESC_ESPERADA = f'10/{ano_sys}' 
+    DESCRICAO_UTILIZADOR = f'Transferencia Poupanca {DATA_DESC_ESPERADA}' 
+    
+    # ... (Omissão de Testes Anteriores 1, 2, 3) ...
 
     # -----------------------------------------------------
-    # TESTE 6: FALHA na Consistência de Valor
-    # Soma Real = 100.00. Valor Total Declarado = '0000000099.00' (Erro).
-    # Qtd OK.
+    # TESTE 4: SUCESSO TOTAL COM IBANs VÁLIDOS -> Esperado: 1
     # -----------------------------------------------------
     print("\n\n#####################################################")
-    print("TESTE 6: CONSISTÊNCIA FALHA (Valor Incorreto)")
+    print("TESTE 4: SUCESSO TOTAL (IBANs Corretos) - Esperado: 1")
     print("#####################################################")
     
-    dados_falha_valor = [
-        # Tipo 1: Declara 3 Transações, mas o Valor Total é 99.00 (Incorreto)
-        {'Tipo Registo': '1', 'Data': f'{ano_sys}1001', 'Entidade': 'Empresa Falha Valor', 'NIF entidade': '501442600', 'Valor total': '0000000099.00', 'Qtd Transações': '00003'}, 
-        # Tipo 2 - 1
-        {'Tipo Registo': '2', 'Data': '20250101', 'Entidade': 'Detalhe 1', 'NIF entidade': '999999999', 'Valor': '10.00'}, 
-        # Tipo 2 - 2
-        {'Tipo Registo': '2', 'Data': '20250101', 'Entidade': 'Detalhe 2', 'NIF entidade': '999999999', 'Valor': '20.00'}, 
-        # Tipo 2 - 3
-        {'Tipo Registo': '2', 'Data': '20250101', 'Entidade': 'Detalhe 3', 'NIF entidade': '999999999', 'Valor': '70.00'}, 
-        {'Tipo Registo': '9', 'Data': '20250103', 'Entidade': 'FIM', 'NIF entidade': '999999999'} 
+    dados_sucesso_iban_ok = [
+        # Tipo 1 (Cabeçalho): 2 transações, 100.00€
+        {'Tipo Registo': '1', 'Data': DATA_TIPO_1, 'Entidade': entidade_ok, 'NIF entidade': '501442600', 'Valor total': VALOR_TOTAL_OK, 'Qtd Transações': QTD_TRANSACOES_OK}, 
+        
+        # Tipo 2 (Detalhe 1): 40.00€ com IBAN 1
+        {'Tipo Registo': '2', 'Data': f'{ano_sys}1026', 'Entidade': 'Detalhe 1', 'NIF entidade': '999999999', 'Valor': '40.00', 'Tipo operação': 'TRF', 'Nº operação': '001', 'IBAN': IBAN_VALIDO_1, 'Descrição': DESCRICAO_UTILIZADOR}, 
+        
+        # Tipo 2 (Detalhe 2): 60.00€ com IBAN 2 (Soma: 100.00)
+        {'Tipo Registo': '2', 'Data': f'{ano_sys}1026', 'Entidade': 'Detalhe 2', 'NIF entidade': '999999999', 'Valor': '60.00', 'Tipo operação': 'TRF', 'Nº operação': '002', 'IBAN': IBAN_VALIDO_2, 'Descrição': DESCRICAO_UTILIZADOR}, 
+        
+        # Tipo 9 (Rodapé): Consistente com Tipo 1 e Detalhes
+        {'Tipo Registo': '9', 'Data': f'{ano_sys}1001', 'Entidade': 'FIM', 'NIF entidade': '999999999', 'Valor total': VALOR_TOTAL_OK, 'Qtd Transações': QTD_TRANSACOES_OK} 
     ]
     
-    resultado_falha_valor = validar_dados(dados_falha_valor)
-    print("\n--- Resultado Final (Teste 6) ---")
-    print(f"Total registos aceites: {len(resultado_falha_valor)}")
-    print(resultado_falha_valor)
+    resultado_sucesso_final = validar_dados(dados_sucesso_iban_ok)
+    print("\n--- Resultado Final (Teste 4) ---")
+    print(f"Status do Ficheiro (1=Válido, 0=Inválido): **{resultado_sucesso_final}**")
