@@ -10,6 +10,7 @@ def main():
         # Chamar função em leitura_ps2.py
         lista_dados = ler_ficheiro_ps2(nome_ficheiro)
 
+        # Converter dados retornados para uma tabela com recurso ao Pandas
         df_Pandas = converterParaPandas(lista_dados)
         df_cabecalho = df_Pandas["cabecalho"]
         df_movimentos = df_Pandas["movimentos"]
