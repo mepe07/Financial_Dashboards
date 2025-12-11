@@ -7,7 +7,7 @@ DIGITOS_CONTROLO = 8
 DIGITOS_NIF = 9
 
 def calcular_digito_controlo(digitos: str) -> str:
-    """Calcula o digito de controle de um NIF."""
+    """Calcula o digito de controlo de um NIF."""
     if not digitos.isdigit():
         raise ValueError("Nem todos os caracteres são digitos")
     
@@ -382,7 +382,7 @@ def validar_dados(lista_dados: list) -> int:
                         print(f"❌ ERRO Linha {numero_linha}: Tipo 9 - Qtd Transações ({qtd_rodapé_declarada}) **inconsistente** com Tipo 1 ({qtd_transacoes_tipo1}) ou contagem Tipo 2 ({contagem_real_tipo2}).")
                         registo_valido = False
                         
-                    # 2b. REQUISITO: Qtd Transações (Tipo 9) vs. Nº Operação da última linha Tipo 2
+                    # 2b. Qtd Transações (Tipo 9) vs. Nº Operação da última linha Tipo 2
                     try:
                         ultimo_num_operacao_int = int(ultimo_num_operacao_tipo2_str)
                         if qtd_rodapé_declarada != ultimo_num_operacao_int:
@@ -399,6 +399,14 @@ def validar_dados(lista_dados: list) -> int:
                 ficheiro_valido = False
             else:
                 print(f"✅ Linha {numero_linha} (Tipo 9): OK.")
+
+    # --- RESULTADO FINAL ---
+    print("\n--- Conclusão da Validação ---")
+    
+    if ficheiro_valido:
+        print("✅ SUCESSO: O ficheiro é totalmente VÁLIDO.")
+    else:
+        print("❌ FALHA: O ficheiro é INVÁLIDO (verifique os erros acima).")
 
     # Retorna 1 se todas as validações correram bem, 0 caso contrário.
     return 1 if ficheiro_valido else 0
