@@ -82,7 +82,8 @@ def ler_ficheiro_ps2(nome_ficheiro):
                 dados_linha.update ({
                     "Tipo operação" : linha[1:8],
                     "Nº operação" : linha[8:11],
-                    "IBAN" : "PT50"+linha[11:41],
+                    "IBAN" : "PT50"+linha[11:32],
+                    "NIF Cliente" : linha[32:41],
                     "Valor" : linha[41:55],
                     "Descrição" : linha[55:].strip()
                 })

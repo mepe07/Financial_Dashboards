@@ -27,14 +27,13 @@ def main():
         # print(df_cabecalho.dtypes)
         
 
-        # #Teste do leitura_ps2.py
-        # for registo in lista_dados:
-        #     print("NOVO REGISTO")
-        #     print("")
-
-        #     for chave, valor in registo.items():
-        #         print(f"{chave}: {valor}")
-        #         print("")
+         #Teste do leitura_ps2.py
+        for registo in lista_dados:
+            print("NOVO REGISTO")
+            print("")
+            for chave, valor in registo.items():
+                print(f"{chave}: {valor}")
+                print("")
 
     except FileNotFoundError as e:
         print(f"Ficheiro não encontrado: {e}")
