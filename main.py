@@ -4,9 +4,11 @@ import sys
 
 def main():
 
-    nome_ficheiro = "exemplo.ps2"
+    #nome_ficheiro = "exemplo.ps2"
+    nome_ficheiro = ""
 
     try:
+        for ficheiro in 
         # Chamar função em leitura_ps2.py
         lista_dados = ler_ficheiro_ps2(nome_ficheiro)
 

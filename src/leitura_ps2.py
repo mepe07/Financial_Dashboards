@@ -26,6 +26,7 @@ def obter_path_data():
 
 
 
+
 def ler_ficheiro_ps2(nome_ficheiro):
     """
     Lê um ficheiro .ps2 e converte o seu conteúdo num dicionário.
@@ -41,6 +42,9 @@ def ler_ficheiro_ps2(nome_ficheiro):
         FileNotFoundError: Se o ficheiro não for encontrado na pasta data.
     """
     pasta_dados = obter_path_data()
+
+    for ficheiro in pasta_dados:
+        print(ficheiro)
     caminho_completo = pasta_dados / nome_ficheiro
 
     if not caminho_completo.exists():
