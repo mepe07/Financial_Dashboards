@@ -12,3 +12,5 @@ Módulos disponíveis:
 from .leitura_ps2 import ler_ficheiro_ps2
 
 from .validacao_ps2 import validar_dados
+
+from .processamento import converterParaPandas

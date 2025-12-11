@@ -2,7 +2,7 @@ import doctest
 from datetime import datetime
 from decimal import Decimal, InvalidOperation 
 
-# --- FUNÇÕES AUXILIARES DE NIF/IBAN (Inalteradas) ---
+# --- FUNÇÕES AUXILIARES DE NIF/IBAN ---
 DIGITOS_CONTROLO = 8 
 DIGITOS_NIF = 9
 
@@ -33,38 +33,47 @@ def valida_nif(nif: str) -> bool:
         return False
     return nif[-1] == calcular_digito_controlo(nif[:DIGITOS_CONTROLO])
 
-TAMANHOS_IBAN = {
-    'PT': 25, 'DE': 22, 'ES': 24, 'FR': 27,
-}
 
 def valida_iban(iban: str) -> bool:
-    """Valida um IBAN usando o algoritmo Modulo 97-10."""
-    iban = iban.replace(' ', '').upper()
-    if len(iban) < 4:
+    """
+    Valida um IBAN usando o algoritmo Modulo 97-10, estritamente para PT (25 caracteres).
+    NÃO ignora erros matemáticos.
+    """
+    
+    CODIGO_PAIS_PT = 'PT'
+    COMPRIMENTO_PT = 25
+    
+    # Limpeza de espaços e quebras de linha
+    iban = str(iban).strip().replace(' ', '').upper()
+    
+    # 1. Validação inicial de comprimento e código de país
+    if len(iban) != COMPRIMENTO_PT or iban[:2] != CODIGO_PAIS_PT:
         return False
-    codigo_pais = iban[:2]
-    comprimento_esperado = TAMANHOS_IBAN.get(codigo_pais)
-    if comprimento_esperado and len(iban) != comprimento_esperado:
-        return False
-    elif not comprimento_esperado and not (15 <= len(iban) <= 34):
-        return False
+
+    # 2. Reorganização: Move os 4 primeiros caracteres (PT50) para o fim
     iban_reorganizado = iban[4:] + iban[:4]
+    
+    # 3. Digitalização (Conversão de Letras para Dígitos)
     def letra_para_digito(char):
         if 'A' <= char <= 'Z':
             return str(ord(char) - ord('A') + 10)
         return char
+        
     iban_digitalizado = "".join(letra_para_digito(c) for c in iban_reorganizado)
+    
+    # 4. Validação Modulo 97-10 (Cálculo Rigoroso)
     try:
-        resto = 0
-        for i in range(0, len(iban_digitalizado), 7):
-            chunk = iban_digitalizado[i:i + 7]
-            resto = int(str(resto) + chunk) % 97
+        numero_completo = int(iban_digitalizado)
+        resto = numero_completo % 97 
+        
+        # Só retorna True se o resto for EXATAMENTE 1
         return resto == 1
+    
     except ValueError:
         return False
 
-
 # --- FUNÇÃO PRINCIPAL DE VALIDAÇÃO ---
+# (Resto do código 'validar_dados' e testes inalterados, usando a nova função valida_iban)
 
 def validar_dados(lista_dados: list) -> int:
     """
@@ -90,7 +99,6 @@ def validar_dados(lista_dados: list) -> int:
     soma_real_valor = Decimal(0)
     erros_tipo2_valor = False
     
-    # Variáveis para referência cruzada:
     mes_base_ficheiro = None 
     ano_base_ficheiro = None
     valor_total_tipo1 = None
@@ -109,10 +117,14 @@ def validar_dados(lista_dados: list) -> int:
                 ano_base_ficheiro = data_str[:4]
                 mes_base_ficheiro = data_str[4:6]
             
-            try:
-                valor_total_tipo1 = Decimal(linha.get("Valor total"))
-            except (TypeError, InvalidOperation):
+            valor_total_str = linha.get("Valor total") 
+            if valor_total_str is None or str(valor_total_str).strip() == "":
                 valor_total_tipo1 = None 
+            else:
+                try:
+                    valor_total_tipo1 = Decimal(valor_total_str)
+                except (InvalidOperation, TypeError):
+                    valor_total_tipo1 = None 
             
             try:
                 qtd_transacoes_tipo1 = int(linha.get("Qtd Transações"))
@@ -120,9 +132,7 @@ def validar_dados(lista_dados: list) -> int:
                 qtd_transacoes_tipo1 = None
 
         if tipo == '2':
-            # Guarda o Nº Operação (para a última linha)
             ultimo_num_operacao_tipo2_str = linha.get("Nº operação")
-
             valor_str = linha.get("Valor")
             if valor_str is None:
                 erros_tipo2_valor = True 
@@ -158,9 +168,8 @@ def validar_dados(lista_dados: list) -> int:
         
     if not ficheiro_valido:
         print("\n🛑 **Validação de Conteúdo Cancelada** devido a erros estruturais.")
-        return 0 # Retorna 0 (Falso) imediatamente
+        return 0 
 
-    # Validação de data base (crítica para o próximo passo)
     if mes_base_ficheiro is None or ano_base_ficheiro is None:
         print("❌ ERRO Estrutural: Impossível extrair Mês/Ano de referência do registo Tipo 1 para validações de detalhe.")
         return 0
@@ -188,10 +197,10 @@ def validar_dados(lista_dados: list) -> int:
         # --- VALIDAÇÕES DO CABEÇALHO (TIPO 1) ---
         if tipo == "1":
             
-            # 1. NIF
+            # 1. NIF Entidade
             nif_atual = linha.get("NIF entidade")
             if not valida_nif(nif_atual):
-                print(f"❌ ERRO Linha {numero_linha}: NIF **inválido** -> '{nif_atual}'")
+                print(f"❌ ERRO Linha {numero_linha}: NIF Entidade **inválido** -> '{nif_atual}'")
                 registo_valido = False
 
             # 2. Ano
@@ -222,13 +231,16 @@ def validar_dados(lista_dados: list) -> int:
             # 4. Valor Total
             valor_total_str = linha.get("Valor total") 
 
-            if valor_total_str is None:
+            # Verificação de robustez 
+            if valor_total_str is None or valor_total_tipo1 is None:
+                print(f"❌ ERRO Linha {numero_linha}: Campo 'Valor total' está **em falta**, vazio ou **não é um número válido**.")
                 registo_valido = False
             else:
                 num_caracteres = len(str(valor_total_str))
                 TAMANHO_ESPERADO = 14
                 
                 if num_caracteres != TAMANHO_ESPERADO:
+                    print(f"❌ ERRO Linha {numero_linha}: Campo 'Valor total' tem {num_caracteres} caracteres. **Tamanho esperado: {TAMANHO_ESPERADO}**.")
                     registo_valido = False
                 
                 try:
@@ -247,6 +259,7 @@ def validar_dados(lista_dados: list) -> int:
             qtd_transacoes_str = linha.get("Qtd Transações")
             
             if qtd_transacoes_str is None:
+                print(f"❌ ERRO Linha {numero_linha}: Campo 'Qtd Transações' está **em falta**.")
                 registo_valido = False
             else:
                 try:
@@ -269,6 +282,12 @@ def validar_dados(lista_dados: list) -> int:
         # --- VALIDAÇÕES DO DETALHE (TIPO 2) ---
         elif tipo == '2':
             
+            # 0. NIF Cliente (VALIDAÇÃO)
+            nif_cliente = linha.get("NIF Cliente") 
+            if not valida_nif(nif_cliente):
+                print(f"❌ ERRO Linha {numero_linha}: Tipo 2 - NIF Cliente **inválido** ou em falta -> '{nif_cliente}'")
+                registo_valido = False
+            
             # 1. Tipo operação
             tipo_operacao = linha.get("Tipo operação")
             if tipo_operacao is None or str(tipo_operacao).strip() == "":
@@ -287,7 +306,7 @@ def validar_dados(lista_dados: list) -> int:
             # 3. IBAN
             iban_str = linha.get("IBAN")
             if iban_str is None or str(iban_str).strip() == "" or not valida_iban(iban_str):
-                print(f"❌ ERRO Linha {numero_linha}: Tipo 2 - IBAN **inválido** ou com formato incorreto. ('{iban_str}')")
+                print(f"❌ ERRO Linha {numero_linha}: Tipo 2 - IBAN inválido ou com formato incorreto. ('{iban_str}')")
                 registo_valido = False
             
             # 4. VALIDAÇÕES DE DESCRIÇÃO
@@ -391,48 +410,50 @@ if __name__ == "__main__":
     agora_teste = datetime.now()
     ano_sys = agora_teste.year
     
-    print(f"\n--- A CORRER TESTES (Ano base sistema: {ano_sys}) ---")
-    
     # -----------------------------------------------------
-    # VARIÁVEIS PARA SUCESSO
+    # VARIÁVEIS PARA SUCESSO (TESTE 4)
     # -----------------------------------------------------
-    # 2 transações que somam 100.00
     VALOR_TOTAL_OK = '0000000100.00' 
     QTD_TRANSACOES_OK = '00002'
-    
     entidade_ok = 'TESTE COM DADOS VALIDOS'
     
-    # IBANs Portugueses Válidos (PT25) que passam no Modulo 97-10
-    IBAN_VALIDO_1 = 'PT50000201021234567890154' 
-    IBAN_VALIDO_2 = 'PT50000700010000000000788' 
+    # NIFs Válidos
+    NIF_ENTIDADE_OK = '501442600'
+    NIF_CLIENTE_OK_1 = '500123456' 
+    NIF_CLIENTE_OK_2 = '500987658' 
+    
+    # IBANs Portugueses Válidos que começam OBRIGATORIAMENTE por PT50
+    # Nota: Tivemos de ajustar os zeros finais para validar matematicamente com PT50
+    IBAN_VALIDO_1 = 'PT50000000000000000000098' 
+    IBAN_VALIDO_2 = 'PT50000000000000000000195' 
     
     DATA_TIPO_1 = f'{ano_sys}1001' 
     DATA_DESC_ESPERADA = f'10/{ano_sys}' 
     DESCRICAO_UTILIZADOR = f'Transferencia Poupanca {DATA_DESC_ESPERADA}' 
     
-    # ... (Omissão de Testes Anteriores 1, 2, 3) ...
+    print(f"\n--- A CORRER TESTES (Ano base sistema: {ano_sys}) ---")
 
     # -----------------------------------------------------
-    # TESTE 4: SUCESSO TOTAL COM IBANs VÁLIDOS -> Esperado: 1
+    # TESTE 4: SUCESSO TOTAL (IBANs PT50 Validados) - Esperado: 1
     # -----------------------------------------------------
     print("\n\n#####################################################")
-    print("TESTE 4: SUCESSO TOTAL (IBANs Corretos) - Esperado: 1")
+    print("TESTE 4: SUCESSO TOTAL (IBANs PT50) - Esperado: 1")
     print("#####################################################")
     
-    dados_sucesso_iban_ok = [
-        # Tipo 1 (Cabeçalho): 2 transações, 100.00€
-        {'Tipo Registo': '1', 'Data': DATA_TIPO_1, 'Entidade': entidade_ok, 'NIF entidade': '501442600', 'Valor total': VALOR_TOTAL_OK, 'Qtd Transações': QTD_TRANSACOES_OK}, 
+    dados_sucesso_nif_cliente_ok = [
+        # Tipo 1 (Cabeçalho)
+        {'Tipo Registo': '1', 'Data': DATA_TIPO_1, 'Entidade': entidade_ok, 'NIF entidade': NIF_ENTIDADE_OK, 'Valor total': VALOR_TOTAL_OK, 'Qtd Transações': QTD_TRANSACOES_OK}, 
         
-        # Tipo 2 (Detalhe 1): 40.00€ com IBAN 1
-        {'Tipo Registo': '2', 'Data': f'{ano_sys}1026', 'Entidade': 'Detalhe 1', 'NIF entidade': '999999999', 'Valor': '40.00', 'Tipo operação': 'TRF', 'Nº operação': '001', 'IBAN': IBAN_VALIDO_1, 'Descrição': DESCRICAO_UTILIZADOR}, 
+        # Tipo 2 (Detalhe 1) - IBAN PT50 Validado
+        {'Tipo Registo': '2', 'Data': f'{ano_sys}1026', 'Entidade': 'Detalhe 1', 'NIF Cliente': NIF_CLIENTE_OK_1, 'Valor': '40.00', 'Tipo operação': 'TRF', 'Nº operação': '001', 'IBAN': IBAN_VALIDO_1, 'Descrição': DESCRICAO_UTILIZADOR}, 
         
-        # Tipo 2 (Detalhe 2): 60.00€ com IBAN 2 (Soma: 100.00)
-        {'Tipo Registo': '2', 'Data': f'{ano_sys}1026', 'Entidade': 'Detalhe 2', 'NIF entidade': '999999999', 'Valor': '60.00', 'Tipo operação': 'TRF', 'Nº operação': '002', 'IBAN': IBAN_VALIDO_2, 'Descrição': DESCRICAO_UTILIZADOR}, 
+        # Tipo 2 (Detalhe 2) - IBAN PT50 Validado
+        {'Tipo Registo': '2', 'Data': f'{ano_sys}1026', 'Entidade': 'Detalhe 2', 'NIF Cliente': NIF_CLIENTE_OK_2, 'Valor': '60.00', 'Tipo operação': 'TRF', 'Nº operação': '002', 'IBAN': IBAN_VALIDO_2, 'Descrição': DESCRICAO_UTILIZADOR}, 
         
-        # Tipo 9 (Rodapé): Consistente com Tipo 1 e Detalhes
+        # Tipo 9 (Rodapé)
         {'Tipo Registo': '9', 'Data': f'{ano_sys}1001', 'Entidade': 'FIM', 'NIF entidade': '999999999', 'Valor total': VALOR_TOTAL_OK, 'Qtd Transações': QTD_TRANSACOES_OK} 
     ]
     
-    resultado_sucesso_final = validar_dados(dados_sucesso_iban_ok)
+    resultado_sucesso_final = validar_dados(dados_sucesso_nif_cliente_ok)
     print("\n--- Resultado Final (Teste 4) ---")
     print(f"Status do Ficheiro (1=Válido, 0=Inválido): **{resultado_sucesso_final}**")
