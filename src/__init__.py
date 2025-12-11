@@ -10,3 +10,5 @@ Módulos disponíveis:
 """
 
 from .leitura_ps2 import ler_ficheiro_ps2
+
+from .processamento import converterParaPandas
