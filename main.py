@@ -4,11 +4,11 @@ import sys
 
 def main():
 
-    #nome_ficheiro = "exemplo.ps2"
-    nome_ficheiro = ""
+    nome_ficheiro = "exemplo.ps2"
+    
 
     try:
-        for ficheiro in 
+        
         # Chamar função em leitura_ps2.py
         lista_dados = ler_ficheiro_ps2(nome_ficheiro)
 
@@ -30,12 +30,12 @@ def main():
         
 
          #Teste do leitura_ps2.py
-        for registo in lista_dados:
-            print("NOVO REGISTO")
-            print("")
-            for chave, valor in registo.items():
-                print(f"{chave}: {valor}")
-                print("")
+        # for registo in lista_dados:
+        #     print("NOVO REGISTO")
+        #     print("")
+        #     for chave, valor in registo.items():
+        #         print(f"{chave}: {valor}")
+        #         print("")
 
     except FileNotFoundError as e:
         print(f"Ficheiro não encontrado: {e}")
