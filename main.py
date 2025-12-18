@@ -12,6 +12,7 @@ def main():
         lista_dados = ler_ficheiro_ps2(nome_ficheiro)
 
         dados_validados = validar_dados(lista_dados)
+
         # Converter dados retornados para uma tabela com recurso ao Pandas
         df_Pandas = converterParaPandas(lista_dados)
         df_cabecalho = df_Pandas["cabecalho"]
