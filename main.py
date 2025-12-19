@@ -4,7 +4,8 @@ import sys
 def main():    
 
     try:
-        
+
+               
         # Chamar função que lê todos os ficheiros ps2
         lista_dados = ler_ficheiros_ps2()
 
