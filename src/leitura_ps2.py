@@ -71,9 +71,9 @@ def ler_ficheiro_ps2(nome_ficheiro):
                 dados_linha.update ({
                     "Data" : linha[1:9],
                     "Entidade" : linha[9:39].strip(),
-                    "NIF entidade" : linha[39:48],
-                    "Valor total" : linha[48:62],
-                    "Qtd Transações" : linha[62:].strip()
+                    "NIF entidade" : linha[52:61],
+                    "Valor total" : linha[62:76],
+                    "Qtd Transações" : linha[76:].strip()
                 })
                
 
