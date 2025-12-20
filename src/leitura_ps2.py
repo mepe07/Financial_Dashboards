@@ -26,6 +26,7 @@ def obter_path_data():
 
 
 
+
 def ler_ficheiro_ps2(nome_ficheiro):
     """
     Lê um ficheiro .ps2 e converte o seu conteúdo num dicionário.
@@ -41,6 +42,8 @@ def ler_ficheiro_ps2(nome_ficheiro):
         FileNotFoundError: Se o ficheiro não for encontrado na pasta data.
     """
     pasta_dados = obter_path_data()
+
+    
     caminho_completo = pasta_dados / nome_ficheiro
 
     if not caminho_completo.exists():
@@ -72,8 +75,8 @@ def ler_ficheiro_ps2(nome_ficheiro):
                     "Data" : linha[1:9],
                     "Entidade" : linha[9:39].strip(),
                     "NIF entidade" : linha[52:61],
-                    "Valor total" : linha[62:76],
-                    "Qtd Transações" : linha[76:].strip()
+                    "Valor total" : linha[61:75],
+                    "Qtd Transações" : linha[75:].strip()
                 })
                
 
@@ -103,6 +106,46 @@ def ler_ficheiro_ps2(nome_ficheiro):
      
 
     return lista_dados
+
+
+def ler_ficheiros_ps2():
+    """
+    Procura todos os ficheiros .ps2 na pasta Data
+    Lê o conteúdo da pasta e devolve uma lista com todos os nomes
+
+    Returns:
+        list: Lista de dicionários
+    """
+
+    # Encontrar a pasta com os ficheiros ps2
+    pasta_dados = obter_path_data()
+
+    # Listar ficheiros ps2
+    lista_ficheiros = list(pasta_dados.glob("*.ps2"))
+
+    todos_os_registos = []
+
+    # Loop pelos ficheiros
+    for ficheiro in lista_ficheiros:
+        nome_ficheiro = ficheiro.name
+
+        try:
+            dados_ficheiro_atual = ler_ficheiro_ps2(nome_ficheiro)
+
+            # Adicionar flag origem
+            for registo in dados_ficheiro_atual:
+                registo["Origem"] = nome_ficheiro
+
+            # Juntar à lista principal
+            todos_os_registos.extend(dados_ficheiro_atual)
+
+        except Exception as e:
+            print(f"Erro ao ler {nome_ficheiro}: {e}")
+
+    return todos_os_registos
+
+
+
 
 
 

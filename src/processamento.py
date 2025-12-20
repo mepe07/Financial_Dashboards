@@ -13,9 +13,13 @@ def converterParaPandas(lista_dicionarios: List[Dict[str, Any]]) -> Dict[str, pd
         pd.DataFrame: O dataframe pronto a ser usado no Shiny.
     """
 
-    # Se a lista estiver vazia, cria uma DataFrame vazio para não dar erro
+    # Se a lista estiver vazia, retorna DataFrames vazios para não dar erro
     if not lista_dicionarios:
-        return pd.DataFrame()
+        return {
+            "cabecalho": pd.DataFrame(),
+            "movimentos": pd.DataFrame(),
+            "rodape": pd.DataFrame()
+        }
     
     # Criar listas temporárias para separar os tipos de registo
     lista_tipo1 = []

@@ -18,9 +18,10 @@ Licenciatura em Engenharia de Sistemas Informáticos (*regime pós-laboral*) 202
 | -- | -- |
 |[data/](./data/)| dados de entrada |
 |[doc/](./doc/)  | relatório em LaTex|
-|[ref/](./ref/)  | documentação do códig (doxygen)| 
+|[ref/](./ref/)  | documentação do código (pdoc)| 
 |[src/](./src/)  | código com a implementação da solução desenvolvida |
 
 ### executar a aplicação 
 
+Explicar como executar o python, relatorio latex, pdoc, etc
 ... completar
