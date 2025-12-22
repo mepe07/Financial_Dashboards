@@ -9,6 +9,7 @@ def main():
         # Chamar função que lê todos os ficheiros ps2
         lista_dados = ler_ficheiros_ps2()
 
+
         if not lista_dados:
             print("Nenhum ficheiro ps2 encontrado")
             return
@@ -17,12 +18,6 @@ def main():
         df_cabecalho = pacote_tabelas["cabecalho"]
         df_movimentos = pacote_tabelas["movimentos"]
         df_rodape = pacote_tabelas["rodape"]
-
-        # Converter dados retornados para uma tabela com recurso ao Pandas
-        # df_Pandas = converterParaPandas(lista_dados)
-        # df_cabecalho = df_Pandas["cabecalho"]
-        # df_movimentos = df_Pandas["movimentos"]
-        # df_rodape = df_Pandas["rodape"]
 
         print("\n=== Tabela: Cabeçalhos ===")
         if not df_cabecalho.empty:
@@ -47,7 +42,7 @@ def main():
         # print(df_cabecalho.dtypes)
         
 
-         #Teste do leitura_ps2.py
+        #  Teste do leitura_ps2.py
         # for registo in lista_dados:
         #     print("NOVO REGISTO")
         #     print("")

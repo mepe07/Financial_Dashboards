@@ -6,6 +6,7 @@ from decimal import Decimal, InvalidOperation
 DIGITOS_CONTROLO = 8 
 DIGITOS_NIF = 9
 
+
 def calcular_digito_controlo(digitos: str) -> str:
     """Calcula o digito de controlo de um NIF."""
     if not digitos.isdigit():
