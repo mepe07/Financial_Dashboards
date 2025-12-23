@@ -1,0 +1,7 @@
+shiny
+pandas
+matplotlib
+faicons
+numpy
+openpyxl
+xlrd
