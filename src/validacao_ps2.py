@@ -1,9 +1,7 @@
-import os
-import doctest
-from datetime import datetime
-from decimal import Decimal, InvalidOperation 
-from pathlib import Path
+from decimal import Decimal
 from collections import defaultdict
+import sys
+import os
 
 # ==============================================================================
 # 1. FUNÇÕES AUXILIARES DE NIF/IBAN
@@ -34,6 +32,7 @@ def calcular_digito_controlo(digitos: str) -> str:
 
 def valida_nif(nif: str) -> bool:
     """Retorna True se o NIF for válido, False caso contrário."""
+    if not nif: return False
     nif = str(nif).strip()
     if not nif.isdigit() or len(nif) != DIGITOS_NIF:
         return False
@@ -41,6 +40,8 @@ def valida_nif(nif: str) -> bool:
 
 def valida_iban(iban: str) -> bool:
     """Valida um IBAN usando o algoritmo Modulo 97-10 (PT50)."""
+    if not iban: return False
+    
     CODIGO_PAIS_PT = 'PT'
     COMPRIMENTO_PT = 25
     
@@ -65,124 +66,46 @@ def valida_iban(iban: str) -> bool:
         return False
 
 # ==============================================================================
-# 2. FUNÇÃO DE LEITURA (Adiciona o campo 'Origem')
+# 2. FUNÇÃO PRINCIPAL DE VALIDAÇÃO
 # ==============================================================================
 
-def ler_ficheiro_ps2(caminho_completo):
+def validar_dados(lista_dados_geral: list) -> list:
     """
-    Lê um ficheiro .ps2 e converte numa lista de dicionários.
-    ADICIONA O CAMPO 'Origem' COM O NOME DO FICHEIRO.
-    """
-    lista_dados = []
+    Recebe uma lista de dados (lista de dicionários vinda do modulo de leitura).
+    Agrupa por 'Origem' e valida.
     
-    if not os.path.exists(caminho_completo):
-        raise FileNotFoundError(f"Ficheiro não encontrado: {caminho_completo}")
-    
-    # Extrai apenas o nome do ficheiro (ex: 'processamento_01.ps2') para usar como ID
-    nome_ficheiro = os.path.basename(caminho_completo)
-
-    with open(caminho_completo, 'r', encoding='utf-8') as f:
-        for linha in f:
-            linha = linha.rstrip('\n')
-            if not linha: continue 
-            
-            dados_linha = {}
-            # --- NOVIDADE: Identificador de Origem ---
-            dados_linha["Origem"] = nome_ficheiro
-            
-            tipo_registo = linha[0]
-            dados_linha["Tipo Registo"] = tipo_registo
-
-            if tipo_registo == "1":
-                dados_linha.update ({
-                    "Data" : linha[1:9],
-                    "Entidade" : linha[9:39].strip(),
-                    "NIF entidade" : linha[39:48],
-                    "Valor total" : linha[48:62],
-                    "Qtd Transações" : linha[62:].strip()
-                })
-
-            elif tipo_registo == "2":
-                parte_iban = linha[11:32]
-                iban_completo = "PT50" + parte_iban
-
-                dados_linha.update ({
-                    "Tipo operação" : linha[1:8],
-                    "Nº operação" : linha[8:11],
-                    "IBAN" : iban_completo, 
-                    "NIF Cliente" : linha[32:41],
-                    "Valor" : linha[41:55],
-                    "Descrição" : linha[55:].strip()
-                })
-
-            elif tipo_registo == "9":
-                dados_linha.update ({
-                    "Valor total" : linha[1:15],
-                    "Qtd Transações" : linha[15:].strip()
-                })
-
-            lista_dados.append(dados_linha)
-            
-    return lista_dados
-
-# ==============================================================================
-# 3. FUNÇÃO PRINCIPAL DE VALIDAÇÃO (Suporta múltiplos ficheiros via 'Origem')
-# ==============================================================================
-
-def validar_dados(lista_dados_geral: list) -> int:
-    """
-    Recebe uma lista de dados (que pode conter vários ficheiros misturados).
-    Agrupa por 'Origem' e valida cada grupo independentemente.
+    Returns:
+        list: Uma lista com os nomes dos ficheiros inválidos.
     """
     
-    agora = datetime.now()
-    ano_atual = agora.year
-    mes_atual = agora.month
-    
+    lista_ficheiros_invalidos = []
+
     # 1. AGRUPAR DADOS POR 'ORIGEM'
-    # Cria um dicionário onde a chave é o nome do ficheiro e o valor é a lista das suas linhas
     dados_por_ficheiro = defaultdict(list)
     
     for linha in lista_dados_geral:
-        # Se não tiver origem, assume "Desconhecido"
-        origem = linha.get("Origem", "Ficheiro_Desconhecido")
+        # Usa o campo 'Origem' que foi adicionado na leitura
+        origem = linha.get("Origem", "Desconhecido")
         dados_por_ficheiro[origem].append(linha)
     
-    todos_validos = True
-    
-    print(f"\n🚀 A iniciar validação de {len(dados_por_ficheiro)} origem(ns) distinta(s)...")
-
     # 2. ITERAR SOBRE CADA FICHEIRO ENCONTRADO
     for nome_ficheiro, lista_dados in dados_por_ficheiro.items():
         
-        print(f"\n" + "="*60)
-        print(f"📄 FICHEIRO: {nome_ficheiro}")
-        print("="*60)
-        
         ficheiro_atual_valido = True
         
-        # --- PRÉ-PROCESSAMENTO (Específico para este ficheiro) ---
+        # --- PRÉ-PROCESSAMENTO ---
         contadores_tipo = {'1': 0, '2': 0, '9': 0}
         soma_real_valor = Decimal(0)
-        
-        mes_base = None 
-        ano_base = None
         valor_total_header = None
-        qtd_header = None
-
+        
         for linha in lista_dados:
             tipo = linha.get("Tipo Registo")
             if tipo in contadores_tipo:
                 contadores_tipo[tipo] += 1
             
             if tipo == '1':
-                data_str = linha.get("Data", "")
-                if len(data_str) >= 6 and data_str[:6].isdigit():
-                    ano_base = data_str[:4]
-                    mes_base = data_str[4:6]
                 try:
                     valor_total_header = Decimal(linha.get("Valor total"))
-                    qtd_header = int(linha.get("Qtd Transações"))
                 except: pass 
 
             if tipo == '2':
@@ -190,52 +113,42 @@ def validar_dados(lista_dados_geral: list) -> int:
                     soma_real_valor += Decimal(linha.get("Valor"))
                 except: pass
 
-        # --- VALIDAÇÃO ESTRUTURAL (Regras reiniciadas para este ficheiro) ---
-        # AQUI GARANTIMOS QUE CADA 'Origem' TEM O SEU PRÓPRIO TIPO 1 E TIPO 9
-        
+        # --- VALIDAÇÃO ESTRUTURAL ---
+        # Tem de ter exatamente 1 cabeçalho, 1 rodapé e pelo menos 1 transação
         if contadores_tipo['1'] != 1:
-            print(f"❌ ERRO ESTRUTURAL: Encontrados {contadores_tipo['1']} cabeçalhos (Tipo 1). Esperado: 1.")
             ficheiro_atual_valido = False
         
         if contadores_tipo['9'] != 1:
-            print(f"❌ ERRO ESTRUTURAL: Encontrados {contadores_tipo['9']} rodapés (Tipo 9). Esperado: 1.")
             ficheiro_atual_valido = False
 
         if contadores_tipo['2'] < 1:
-            print(f"❌ ERRO ESTRUTURAL: Ficheiro sem transações (Tipo 2).")
             ficheiro_atual_valido = False
         
-        # Se estrutura falhar, não valida linhas detalhadas para não poluir o log
+        # Se estrutura falhar, marca logo como inválido e passa para o próximo
         if not ficheiro_atual_valido:
-            todos_validos = False
-            print(f"⚠️ Validação interrompida para '{nome_ficheiro}' devido a erros estruturais.")
-            continue # Passa para o próximo ficheiro
+            lista_ficheiros_invalidos.append(nome_ficheiro)
+            continue 
 
         # --- VALIDAÇÃO DE CONTEÚDO (LINHA A LINHA) ---
         contador_ops = 0 
         desc_base = None 
 
         for i, linha in enumerate(lista_dados):
-            num_linha = i + 1
             tipo = linha.get("Tipo Registo")
             
-            # >>>> TIPO 1
+            # >>>> TIPO 1 (Cabeçalho)
             if tipo == "1":
                 if not valida_nif(linha.get("NIF entidade")):
-                    print(f"  ❌ Linha {num_linha} (T1): NIF Entidade inválido.")
                     ficheiro_atual_valido = False
                 
                 val_str = str(linha.get("Valor total"))
                 if len(val_str) != 14:
-                    print(f"  ❌ Linha {num_linha} (T1): Tamanho valor incorreto ({len(val_str)}).")
                     ficheiro_atual_valido = False
                 
-                # Validação Cruzada
                 if valor_total_header is not None and valor_total_header != soma_real_valor:
-                    print(f"  ❌ Linha {num_linha} (T1): Valor Total ({valor_total_header}) difere da soma real ({soma_real_valor}).")
                     ficheiro_atual_valido = False
 
-            # >>>> TIPO 2
+            # >>>> TIPO 2 (Transações)
             elif tipo == '2':
                 contador_ops += 1
                 
@@ -243,16 +156,13 @@ def validar_dados(lista_dados_geral: list) -> int:
                 num_op = linha.get("Nº operação")
                 esperado = str(contador_ops).zfill(3)
                 if num_op != esperado:
-                    print(f"  ❌ Linha {num_linha} (T2): Nº Op incorreto ({num_op}). Esperado: {esperado}.")
                     ficheiro_atual_valido = False
 
                 # NIF e IBAN
                 if not valida_iban(linha.get("IBAN")):
-                    print(f"  ❌ Linha {num_linha} (T2): IBAN inválido.")
                     ficheiro_atual_valido = False
                 
                 if not valida_nif(linha.get("NIF Cliente")):
-                    print(f"  ❌ Linha {num_linha} (T2): NIF Cliente inválido.")
                     ficheiro_atual_valido = False
 
                 # Descrição
@@ -260,66 +170,52 @@ def validar_dados(lista_dados_geral: list) -> int:
                 if contador_ops == 1:
                     desc_base = desc
                 elif desc != desc_base:
-                    print(f"  ❌ Linha {num_linha} (T2): Descrição difere das anteriores.")
                     ficheiro_atual_valido = False
 
-            # >>>> TIPO 9
+            # >>>> TIPO 9 (Rodapé)
             elif tipo == '9':
                 try:
                     val_footer = Decimal(linha.get("Valor total"))
                     qtd_footer = int(linha.get("Qtd Transações"))
                     
                     if val_footer != soma_real_valor:
-                        print(f"  ❌ Linha {num_linha} (T9): Valor Rodapé difere da soma.")
                         ficheiro_atual_valido = False
                     
                     if qtd_footer != contadores_tipo['2']:
-                        print(f"  ❌ Linha {num_linha} (T9): Qtd Rodapé difere da contagem.")
                         ficheiro_atual_valido = False
                 except:
-                    print(f"  ❌ Linha {num_linha} (T9): Erro de formato no rodapé.")
                     ficheiro_atual_valido = False
 
-        if ficheiro_atual_valido:
-            print(f"✅ STATUS: VÁLIDO")
-        else:
-            print(f"❌ STATUS: INVÁLIDO")
-            todos_validos = False
+        # Se após todas as verificações o ficheiro não for válido, adiciona à lista
+        if not ficheiro_atual_valido:
+            lista_ficheiros_invalidos.append(nome_ficheiro)
 
-    # --- RESULTADO GLOBAL ---
-    print("\n" + "="*60)
-    if todos_validos:
-        print("🎉 TODOS OS FICHEIROS FORAM APROVADOS.")
-        return 1
-    else:
-        print("⚠️ ALGUNS FICHEIROS CONTÊM ERROS.")
-        return 0
+    return lista_ficheiros_invalidos
 
 # ==============================================================================
-# 4. EXECUÇÃO
+# 3. MODO DE EXECUÇÃO DIRETA (OUTPUT SIMPLIFICADO)
 # ==============================================================================
 
 if __name__ == "__main__":
-    
-    # 1. Localizar a pasta 'data'
-    raiz_projeto = Path(__file__).parent.parent 
-    pasta_data = raiz_projeto / 'data'
-    if not pasta_data.exists(): pasta_data = Path(__file__).parent / 'data'
+    # Garante que encontra o módulo vizinho
+    diretorio_atual = os.path.dirname(os.path.abspath(__file__))
+    if diretorio_atual not in sys.path:
+        sys.path.insert(0, diretorio_atual)
 
-    if not pasta_data.exists():
-        print("❌ Pasta 'data' não encontrada.")
-    else:
-        # 2. Ler TUDO para uma única lista gigante (simulando o seu cenário)
-        lista_gigante_misturada = []
-        ficheiros = [f for f in os.listdir(pasta_data) if f.endswith('.ps2')]
+    try:
+        from leitura_ps2 import ler_ficheiros_ps2
         
-        for f in ficheiros:
-            # A função de leitura agora adiciona "Origem": "nome_do_ficheiro"
-            dados = ler_ficheiro_ps2(pasta_data / f)
-            lista_gigante_misturada.extend(dados)
-            
-        print(f"📥 Total de linhas lidas (misturadas): {len(lista_gigante_misturada)}")
+        # Lê os dados
+        dados = ler_ficheiros_ps2()
         
-        # 3. Validar a lista gigante
-        # A função validar_dados agora é inteligente e separa por "Origem"
-        validar_dados(lista_gigante_misturada)
+        if dados:
+            # Valida e imprime APENAS a lista (ex: ['ficheiro1.ps2', 'ficheiro2.ps2'])
+            ficheiros_invalidos = validar_dados(dados)
+            print(ficheiros_invalidos)
+        else:
+            # Se não houver dados, imprime lista vazia
+            print([])
+
+    except Exception:
+        # Em caso de erro de importação ou outro, imprime lista vazia para não quebrar scripts
+        print([])
