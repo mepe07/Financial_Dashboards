@@ -71,7 +71,7 @@ app_ui = ui.page_sidebar(
                 format="dd/mm/yyyy", 
                 language="pt-pt"
             )
-),
+        ),
 
         # Linha divisória
         # ui.hr(),
@@ -83,10 +83,11 @@ app_ui = ui.page_sidebar(
 
         ui.input_select(
             "filtro_ficheiro", "Ficheiro Específico:", 
-            choices=opcoes_ficheiros, selected="Todos"
+            choices=opcoes_ficheiros, selected="Todos",
+            
         ),
         
-        ui.hr(),
+        ui.hr(style="margin: 5px 0;"),
 
         # Checkboxes        
         ui.input_checkbox_group(
@@ -104,7 +105,7 @@ app_ui = ui.page_sidebar(
             selected=["g_barras", "g_linhas", "g_linhas_global", "g_hist", "g_pareto"] 
         ),
         
-        ui.hr(),
+        ui.hr(style="margin: 5px 0;"),
         
         ui.p("Resumo:"),
         ui.output_text("texto_total_registos")
@@ -400,8 +401,11 @@ def server(input, output, session):
         rod = df_rodape[df_rodape["Origem"].isin(ficheiros_validos)]
 
         return {"cab": cab, "mov": mov, "rod": rod}
-
+    
+    # -------------------------------------
     # --- TABELAS ---
+    # -------------------------------------
+
     @render.data_frame
     def tabela_cabecalho():
         df = dados_filtrados()["cab"].copy()
@@ -428,7 +432,9 @@ def server(input, output, session):
             total_euros = dados['cab']["Valor total"].sum()
         return f"{num_docs} documentos | Total: {total_euros:,.2f} €"
 
+    # ---------------------------------------
     # --- LÓGICA DOS GRÁFICOS ---    
+    # ---------------------------------------
 
     @render.plot
     def grafico_barras_entidade():
@@ -751,6 +757,58 @@ def server(input, output, session):
         
         plt.tight_layout()
         return fig
+    
+
+    # -----------------------------------
+    # --- CHECKBOX DINAMICAS
+    # -----------------------------------
+
+    @reactive.effect
+    def gerir_opcoes_graficos():
+        # 1. Ler os filtros
+        entidade = input.filtro_entidade()
+        ficheiro = input.filtro_ficheiro()
+
+        # 2. Ler seleção atual de forma isolada (para não criar ciclo infinito)
+        with reactive.isolate():
+            selecao_atual = list(input.selecao_graficos())
+
+        # 3. Lógica de atualização
+        if entidade == "Todas" and ficheiro == "Todos":
+            # CASO 1: Mostrar "Evolução Global"
+            novas_opcoes = {
+                "g_barras": "Top Entidades",
+                "g_linhas": "Evolução Mensal",
+                "g_linhas_global": "Evolução Global", 
+                "g_hist": "Histograma",
+                "g_pareto": "Pareto"
+            }
+            
+            # --- O TRUQUE ESTÁ AQUI ---
+            # Se a opção global não estiver selecionada, adicionamo-la manualmente
+            if "g_linhas_global" not in selecao_atual:
+                selecao_atual.append("g_linhas_global")
+            # --------------------------
+
+        else:
+            # CASO 2: Esconder "Evolução Global"
+            novas_opcoes = {
+                "g_barras": "Top Entidades",
+                "g_linhas": "Evolução Mensal",
+                "g_hist": "Histograma",
+                "g_pareto": "Pareto"
+            }
+            
+            # Removemos da seleção para não causar erros (pois a opção deixou de existir)
+            if "g_linhas_global" in selecao_atual:
+                selecao_atual.remove("g_linhas_global")
+
+        # 4. Atualizar o Input
+        ui.update_checkbox_group(
+            "selecao_graficos",
+            choices=novas_opcoes,
+            selected=selecao_atual # Enviamos a lista corrigida
+        )
 
 
 
