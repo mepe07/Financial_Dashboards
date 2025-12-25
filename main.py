@@ -1,4 +1,4 @@
-from src import ler_ficheiro_ps2, ler_ficheiros_ps2, converterParaPandas
+from src import ler_ficheiro_ps2, ler_ficheiros_ps2, converterParaPandas, validar_dados
 import sys
 
 def main():    
@@ -14,6 +14,8 @@ def main():
             print("Nenhum ficheiro ps2 encontrado")
             return
         
+        dados_validados = validar_dados(lista_dados)
+
         pacote_tabelas = converterParaPandas(lista_dados)
         df_cabecalho = pacote_tabelas["cabecalho"]
         df_movimentos = pacote_tabelas["movimentos"]
