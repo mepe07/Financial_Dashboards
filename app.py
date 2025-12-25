@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import date
 from src import ler_ficheiros_ps2
 from src import converterParaPandas
+from src import validar_dados
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import numpy as np
@@ -11,7 +12,14 @@ from matplotlib.ticker import PercentFormatter # Para o eixo da % do grafico de 
 
 # --- 1. CARREGAMENTO DE DADOS ---
 dados_brutos = ler_ficheiros_ps2()
-pacote = converterParaPandas(dados_brutos)
+ficheiros_invalidos = validar_dados(dados_brutos)
+
+dados_validos = [
+    dado for dado in dados_brutos
+    if dado.get("Origem") not in ficheiros_invalidos
+]
+
+pacote = converterParaPandas(dados_validos)
 
 df_cabecalho_global = pacote["cabecalho"]
 df_movimentos_global = pacote["movimentos"]
@@ -147,13 +155,40 @@ app_ui = ui.page_sidebar(
                 ),
 
                 # Botão de notificações
+                # 1. O SCRIPT MÁGICO (Ensina o browser a ligar/desligar a animação)
+                ui.tags.script("""
+                    Shiny.addCustomMessageHandler('gerir_animacao_sino', function(mensagem) {
+                        // Procura o botão pelo ID
+                        var botao = document.getElementById(mensagem.id);
+                        if (botao) {
+                            if (mensagem.ativar) {
+                                botao.classList.add('tem-notificacao'); // Liga animação
+                            } else {
+                                botao.classList.remove('tem-notificacao'); // Desliga animação
+                            }
+                        }
+                    });
+                """),
+
+                # 2. O BOTÃO ESTÁTICO (Aparece instantaneamente!)
+                # Nota: Removemos o @render.ui e colocamos o botão "fixo" aqui
                 ui.input_action_button(
                     "btn_notificacoes", 
                     "Notificações", 
                     icon=icon_svg("bell"), 
-                    class_="btn-secondary tem-notificacao",
-                    # style="display: flex; align-items: center; justify-content: center; padding: 0;"
+                    class_="btn-secondary", # Começa cinzento (sem animação)
+                    # Mantemos o estilo visual
+                    #style="display: flex; align-items: center; justify-content: center; padding: 0;"
                 ),
+                
+                # ui.input_action_button(
+                #     "btn_notificacoes_placeholder", 
+                #     "Notificações", 
+                #     icon=icon_svg("bell"), 
+                #     class_="btn-secondary",
+                #     # style="display: flex; align-items: center; justify-content: center; padding: 0;"
+                # ),
+                #ui.output_ui("render_botao_notificacoes"),
 
                 style="display: flex; gap: 10px;"
 
@@ -308,8 +343,10 @@ app_ui = ui.page_sidebar(
 def server(input, output, session):
 
     # --- 1. GESTÃO DE DADOS ---
-    # Container reativo para guardar os dados carregados
+    # Container reativo para guardar os dados carregados e também invalidos
     store_dados = reactive.Value(pacote)
+    store_invalidos = reactive.Value(ficheiros_invalidos)
+
 
     # Função que carrega os dados do disco (ao iniciar e ao clicar no botão)
     # Função que carrega os dados do disco (ao iniciar e ao clicar no botão)
@@ -322,14 +359,29 @@ def server(input, output, session):
         try:
             print("--- A CARREGAR DADOS ---")
             # Ler novamente da pasta
-            dados_brutos = ler_ficheiros_ps2() 
-            pacote = converterParaPandas(dados_brutos)
+            novos_dados_brutos = ler_ficheiros_ps2() 
+
+            # Nova validação, pois podem ter entrado ficheiros invalidos
+            lista_erros = validar_dados(novos_dados_brutos)
+            store_invalidos.set(lista_erros) # guardar na memória reativa
+
+            # Se houver erros, avisar imeatamente
+            if lista_erros:
+                msg = f"Atenção: Foram detetados {len(lista_erros)} ficheiros inválidos!"
+                ui.notification_show(msg, type="warning", duration=5)
             
-            # Guardar no container reativo
-            store_dados.set(pacote)
+            # FILTRAGEM - Lista apenas com os ficheiros que passaram na validação
+            dados_validos = [
+                dado for dado in novos_dados_brutos
+                if dado.get("Origem") not in lista_erros
+            ]
+
+            # Converter para pandas e guardar os válidos
+            novo_pacote = converterParaPandas(dados_validos)
+            store_dados.set(novo_pacote)
             
             # Atualizar os Filtros da UI dinamicamente
-            df_cab = pacote["cabecalho"]
+            df_cab = novo_pacote["cabecalho"]
             if not df_cab.empty:
                 # Atualizar Entidades
                 ents = ["Todas"] + sorted(df_cab["Entidade"].unique().tolist())
@@ -355,6 +407,63 @@ def server(input, output, session):
         finally:
             # Fechar notificação
             ui.notification_remove(id_notificacao)
+
+        
+
+    @reactive.effect
+    @reactive.event(input.btn_notificacoes)
+    def mostrar_janela_erros():
+        # Vamos buscar a lista atual de erros
+        erros = store_invalidos()
+        
+        if erros:
+            # CASO A: Existem erros -> Mostra Janela (Modal)
+            ui.modal_show(
+                ui.modal(
+                    ui.div(
+                        ui.h4("Ficheiros Rejeitados", style="color: #dc3545; margin-top:0;"),
+                        ui.p("Os seguintes ficheiros não respeitam o formato PS2 ou contêm erros de estrutura:"),
+                        ui.hr(),
+                        
+                        # Cria uma lista HTML (Bullet points) dinâmica
+                        ui.tags.ul(
+                            # Loop que cria um <li> para cada ficheiro na lista
+                            [ui.tags.li(nome, style="color: #dc3545; font-weight: bold;") for nome in erros]
+                        ),
+                        
+                        ui.hr(),
+                        ui.p("Nota: Estes ficheiros foram ignorados e não constam nos gráficos.", style="font-size: 0.9em; color: gray;")
+                    ),
+                    title="Alertas do Sistema",
+                    easy_close=True,
+                    footer=ui.modal_button("Fechar")
+                )
+            )
+        # else:
+        #     # CASO B: Não existem erros -> Notificação Verde
+        #     ui.notification_show("Tudo operacional! Não existem ficheiros inválidos.", type="message", duration=3)
+
+
+
+    # NOVO: Controlar a animação sem redesenhar o botão
+    # NOTA: Adicionámos 'async' antes do def
+    @reactive.effect
+    async def controlar_animacao_botao():
+        # Lemos a lista de erros
+        erros = store_invalidos()
+        
+        # Calculamos se deve ter animação
+        tem_erro = True if erros else False
+        
+        
+        # O print ajuda a confirmar no terminal se a função está a correr
+        # print(f"DEBUG: Atualizar botão. Tem erros? {tem_erro}") 
+        
+        # NOTA: Adicionámos 'await' aqui. É isto que faz a mensagem sair!
+        await session.send_custom_message(
+            "gerir_animacao_sino", 
+            {"id": "btn_notificacoes", "ativar": tem_erro}
+        )
 
 
     # --- 2. CÁLCULOS E FILTROS ---
@@ -450,7 +559,7 @@ def server(input, output, session):
         # 1. Agrupar, Somar e Ordenar
         soma_entidade = df.groupby("Entidade")["Valor total"].sum().sort_values(ascending=False)
         
-        # 2. Top 15
+        # 2. Top 15 (Mantemos a lógica visual para o gráfico não ficar gigante)
         if len(soma_entidade) > 15:
             soma_entidade = soma_entidade.head(15)
 
@@ -469,8 +578,18 @@ def server(input, output, session):
         ax.bar_label(bars, fmt='€%.2f', padding=3, fontsize=9)
         
         # --- LÓGICA DO TÍTULO DINÂMICO ---
-        titulo_base = "Total Cobrado por Entidade (Top 15)"
         
+        # Ler os inputs para saber se há filtros ativos
+        entidade_selecionada = input.filtro_entidade()
+        ficheiro_selecionado = input.filtro_ficheiro()
+
+        # Condição: Só mostra "(Top 15)" se NÃO houver filtros específicos
+        if entidade_selecionada == "Todas" and ficheiro_selecionado == "Todos":
+            titulo_base = "Total Cobrado por Entidade (Top 15)"
+        else:
+            titulo_base = "Total Cobrado" # Removemos a menção ao Top 15
+
+        # Lógica de Datas
         if input.ativar_filtro_data():
             datas = input.filtro_data()
             if datas:
@@ -511,6 +630,8 @@ def server(input, output, session):
             return fig
 
         # 2. PREPARAÇÃO DOS DADOS
+        # Nota: Mantemos o filtro Top 5 na lógica de dados para garantir que o gráfico 
+        # não fica ilegível se selecionar um ficheiro com 50 entidades, por exemplo.
         top_entidades = df.groupby("Entidade")["Valor total"].sum().nlargest(5).index.tolist()
         df_top = df[df["Entidade"].isin(top_entidades)]
         
@@ -541,8 +662,19 @@ def server(input, output, session):
         # 6. Formatar Valores (Eixo Y)
         ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'€{x:,.0f}'))
 
-        # 7. Título Dinâmico
-        titulo_base = "Evolução Mensal (Top 5 Entidades)"
+        # 7. --- TÍTULO DINÂMICO ---
+        
+        entidade_selecionada = input.filtro_entidade()
+        ficheiro_selecionado = input.filtro_ficheiro()
+
+        # Se não houver filtros, especificamos que é o Top 5.
+        # Se houver filtros, usamos um título genérico.
+        if entidade_selecionada == "Todas" and ficheiro_selecionado == "Todos":
+            titulo_base = "Evolução Mensal (Top 5 Entidades)"
+        else:
+            titulo_base = "Evolução Mensal das Cobranças"
+
+        # Adicionar datas ao título
         if input.ativar_filtro_data():
             datas = input.filtro_data()
             if datas:
