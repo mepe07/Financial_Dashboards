@@ -27,4 +27,4 @@ env/
 *.synctex.gz
 # Remover mais tarde se quiser enviar o pdf para o Git
 *.pdf
-ref/*.png
+#ref/*.png

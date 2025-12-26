@@ -1,5 +1,5 @@
 """
-Módulo de Leitura e Processamento de Ficheiros .ps2.
+Módulo de Leitura de Ficheiros .ps2.
 
 Este módulo é responsável por localizar os dados de forma dinâmica
 e extrair informações dos ficheiros .ps2.
