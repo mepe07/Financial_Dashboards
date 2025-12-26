@@ -23,5 +23,10 @@ Licenciatura em Engenharia de Sistemas Informáticos (*regime pós-laboral*) 202
 
 ### executar a aplicação 
 
-Explicar como executar o python, relatorio latex, pdoc, etc
-... completar
+Como executar o Shiny:
+1 - Dentro da pasta do projeto, executar o comando "shiny run --reload app.py"
+2 - No browser, aceder ao seguinte endereço: http://127.0.0.1:8000/
+
+Como gerar o relatório LaTex:
+
+Como gerar ficheiros PDF pdoc:
