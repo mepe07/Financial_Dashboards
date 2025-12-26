@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>src.processamento API documentation</title>
+<meta name="description" content="Módulo onde são agrupados os dados lidos em listas de dicionários">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.processamento</code></h1>
+</header>
+<section id="section-intro">
+<p>Módulo onde são agrupados os dados lidos em listas de dicionários</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="src.processamento.converterParaPandas"><code class="name flex">
+<span>def <span class="ident">converterParaPandas</span></span>(<span>lista_dicionarios: List[Dict[str, Any]]) ‑> Dict[str, pandas.core.frame.DataFrame]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def converterParaPandas(lista_dicionarios: List[Dict[str, Any]]) -&gt; Dict[str, pd.DataFrame]:
+    &#34;&#34;&#34;
+    Converte a lista de dados brutos em DataFrames do Pandas organizados e limpos.
+
+    Esta função recebe a lista de dicionários gerada pela leitura dos ficheiros PS2
+    e realiza três operações principais:
+    1.  **Separação:** Divide os dados em três tabelas distintas baseadas no `Tipo Registo` (1, 2 ou 9).
+    2.  **Criação:** Instancia DataFrames do Pandas para cada tipo.
+    3.  **Limpeza:** Converte strings de datas para objetos `datetime` e transforma
+        valores monetários (que vêm em cêntimos/inteiros) para decimais (divisão por 100).
+
+    Args:
+        lista_dicionarios (List[Dict[str, Any]]): A lista crua contendo todos os registos
+            lidos dos ficheiros. Cada item da lista é um dicionário representando uma linha do ficheiro.
+
+    Returns:
+        Dict[str, pd.DataFrame]: Um dicionário contendo as três estruturas de dados essenciais:
+            
+            * **`&#34;cabecalho&#34;`** (*pd.DataFrame*): Registos do Tipo 1 (Dados da Entidade/Ficheiro).
+            * **`&#34;movimentos&#34;`** (*pd.DataFrame*): Registos do Tipo 2 (Detalhe de cada cobrança/cliente).
+            * **`&#34;rodape&#34;`** (*pd.DataFrame*): Registos do Tipo 9 (Totais de controlo).
+
+    Example:
+        ```python
+        dados_raw = ler_ficheiros_ps2()
+        pacote = converterParaPandas(dados_raw)
+
+        # Aceder aos movimentos
+        df_mov = pacote[&#39;movimentos&#39;]
+        
+        # Aceder ao cabeçalho
+        df_cab = pacote[&#39;cabecalho&#39;]
+        ```
+    &#34;&#34;&#34;
+
+    # Se a lista estiver vazia, retorna DataFrames vazios para garantir a estabilidade do tipo de retorno
+    if not lista_dicionarios:
+        return {
+            &#34;cabecalho&#34;: pd.DataFrame(),
+            &#34;movimentos&#34;: pd.DataFrame(),
+            &#34;rodape&#34;: pd.DataFrame()
+        }
+    
+    # Criar listas temporárias para separar os tipos de registo
+    lista_tipo1 = []
+    lista_tipo2 = []
+    lista_tipo9 = []
+
+    # Separar os tipos de registo
+    for registo in lista_dicionarios:
+        # Se a chave &#34;Tipo Registo&#34; falhar ou não existir, assume &#39;0&#39; (ignorado)
+        tipoReg = registo.get(&#34;Tipo Registo&#34;, &#39;0&#39;)
+
+        if str(tipoReg) == &#39;1&#39;:
+            lista_tipo1.append(registo)
+        elif str(tipoReg) == &#39;2&#39;:
+            lista_tipo2.append(registo)
+        elif str(tipoReg) == &#39;9&#39;:
+            lista_tipo9.append(registo)
+
+    # Criar DataFrames limpos a partir das listas separadas
+    df_t1 = pd.DataFrame(lista_tipo1)
+    df_t2 = pd.DataFrame(lista_tipo2)
+    df_t9 = pd.DataFrame(lista_tipo9)
+
+    # --- LÓGICA DE LIMPEZA E CONVERSÃO DE TIPOS ---
+
+    # 1. Limpeza Tabela Tipo 1 (Cabeçalho)
+    if not df_t1.empty:
+        # Converter string &#39;YYYYMMDD&#39; para objeto datetime real
+        if &#34;Data&#34; in df_t1.columns:
+            df_t1[&#34;Data&#34;] = pd.to_datetime(df_t1[&#34;Data&#34;], format=&#39;%Y%m%d&#39;, errors=&#39;coerce&#39;)
+
+        # Converter valores monetários (Ex: 1500 -&gt; 15.00)
+        if &#34;Valor total&#34; in df_t1.columns:
+            df_t1[&#34;Valor total&#34;] = pd.to_numeric(df_t1[&#34;Valor total&#34;], errors=&#39;coerce&#39;) / 100
+
+    # 2. Limpeza Tabela Tipo 2 (Movimentos)
+    if not df_t2.empty:
+        # Converter &#39;Valor&#39; individual para float
+        if &#39;Valor&#39; in df_t2.columns:
+            df_t2[&#34;Valor&#34;] = pd.to_numeric(df_t2[&#34;Valor&#34;], errors=&#39;coerce&#39;) / 100
+
+    # 3. Limpeza Tabela Tipo 9 (Rodapé)
+    if not df_t9.empty:
+        # Converter totais de controlo para float
+        if &#34;Valor total&#34; in df_t9.columns:
+            df_t9[&#34;Valor total&#34;] = pd.to_numeric(df_t9[&#34;Valor total&#34;], errors=&#39;coerce&#39;) / 100
+
+    return {
+        &#34;cabecalho&#34;: df_t1,
+        &#34;movimentos&#34;: df_t2,
+        &#34;rodape&#34;: df_t9
+    }</code></pre>
+</details>
+<div class="desc"><p>Converte a lista de dados brutos em DataFrames do Pandas organizados e limpos.</p>
+<p>Esta função recebe a lista de dicionários gerada pela leitura dos ficheiros PS2
+e realiza três operações principais:
+1.
+<strong>Separação:</strong> Divide os dados em três tabelas distintas baseadas no <code>Tipo Registo</code> (1, 2 ou 9).
+2.
+<strong>Criação:</strong> Instancia DataFrames do Pandas para cada tipo.
+3.
+<strong>Limpeza:</strong> Converte strings de datas para objetos <code>datetime</code> e transforma
+valores monetários (que vêm em cêntimos/inteiros) para decimais (divisão por 100).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>lista_dicionarios</code></strong> :&ensp;<code>List[Dict[str, Any]]</code></dt>
+<dd>A lista crua contendo todos os registos
+lidos dos ficheiros. Cada item da lista é um dicionário representando uma linha do ficheiro.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Dict[str, pd.DataFrame]</code></dt>
+<dd>
+<p>Um dicionário contendo as três estruturas de dados essenciais:</p>
+<ul>
+<li><strong><code>"cabecalho"</code></strong> (<em>pd.DataFrame</em>): Registos do Tipo 1 (Dados da Entidade/Ficheiro).</li>
+<li><strong><code>"movimentos"</code></strong> (<em>pd.DataFrame</em>): Registos do Tipo 2 (Detalhe de cada cobrança/cliente).</li>
+<li><strong><code>"rodape"</code></strong> (<em>pd.DataFrame</em>): Registos do Tipo 9 (Totais de controlo).</li>
+</ul>
+</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python">dados_raw = ler_ficheiros_ps2()
+pacote = converterParaPandas(dados_raw)
+
+# Aceder aos movimentos
+df_mov = pacote['movimentos']
+
+# Aceder ao cabeçalho
+df_cab = pacote['cabecalho']
+</code></pre></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src" href="index.html">src</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="src.processamento.converterParaPandas" href="#src.processamento.converterParaPandas">converterParaPandas</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

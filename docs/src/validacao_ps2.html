@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>src.validacao_ps2 API documentation</title>
+<meta name="description" content="Módulo de Validação PS2 (validacao_ps2.py) …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.validacao_ps2</code></h1>
+</header>
+<section id="section-intro">
+<h1 id="modulo-de-validacao-ps2-validacao_ps2py">Módulo de Validação PS2 (validacao_ps2.py)</h1>
+<p>Este módulo é responsável por verificar a integridade lógica e estrutural dos dados
+extraídos dos ficheiros <code>.ps2</code>.</p>
+<h2 id="funcionalidades">Funcionalidades</h2>
+<ul>
+<li><strong>Validação Fiscal:</strong> Verifica a validade de NIFs (Entidades e Clientes).</li>
+<li><strong>Validação Bancária:</strong> Verifica a validade de IBANs portugueses (PT50).</li>
+<li><strong>Validação Estrutural:</strong> Garante a existência de Cabeçalho, Transações e Rodapé.</li>
+<li><strong>Consistência de Totais:</strong> Compara os somatórios das transações com os valores declarados.</li>
+<li><strong>Sequencialidade:</strong> Verifica a numeração sequencial das operações.</li>
+</ul>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="src.validacao_ps2.DIGITOS_CONTROLO"><code class="name">var <span class="ident">DIGITOS_CONTROLO</span></code></dt>
+<dd>
+<div class="desc"><p>int: Número de dígitos base para cálculo do controlo (primeiros 8).</p></div>
+</dd>
+<dt id="src.validacao_ps2.DIGITOS_NIF"><code class="name">var <span class="ident">DIGITOS_NIF</span></code></dt>
+<dd>
+<div class="desc"><p>int: Tamanho total esperado de um NIF português.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="src.validacao_ps2.calcular_digito_controlo"><code class="name flex">
+<span>def <span class="ident">calcular_digito_controlo</span></span>(<span>digitos: str) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calcular_digito_controlo(digitos: str) -&gt; str:
+    &#34;&#34;&#34;
+    Calcula o dígito de controlo (o 9º dígito) baseado nos 8 primeiros dígitos de um NIF.
+    Utiliza o algoritmo de Módulo 11.
+
+    Args:
+        digitos (str): String contendo os primeiros 8 dígitos.
+
+    Returns:
+        str: O dígito de controlo calculado (&#39;0&#39; a &#39;9&#39;).
+    &#34;&#34;&#34;
+    if not digitos.isdigit():
+        raise ValueError(&#34;Nem todos os caracteres são digitos&#34;)
+    
+    soma = (
+        int(digitos[0]) * 9
+        + int(digitos[1]) * 8
+        + int(digitos[2]) * 7
+        + int(digitos[3]) * 6
+        + int(digitos[4]) * 5
+        + int(digitos[5]) * 4
+        + int(digitos[6]) * 3
+        + int(digitos[7]) * 2
+    )
+    resto = soma % 11
+    if resto == 0 or resto == 1:
+        return &#34;0&#34;
+    return str(11 - resto)</code></pre>
+</details>
+<div class="desc"><p>Calcula o dígito de controlo (o 9º dígito) baseado nos 8 primeiros dígitos de um NIF.
+Utiliza o algoritmo de Módulo 11.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>digitos</code></strong> :&ensp;<code>str</code></dt>
+<dd>String contendo os primeiros 8 dígitos.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>O dígito de controlo calculado ('0' a '9').</dd>
+</dl></div>
+</dd>
+<dt id="src.validacao_ps2.valida_iban"><code class="name flex">
+<span>def <span class="ident">valida_iban</span></span>(<span>iban: str) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def valida_iban(iban: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Valida um IBAN português utilizando o algoritmo Modulo 97-10.
+    Assume que o IBAN deve começar por &#39;PT&#39; e ter 25 caracteres.
+
+    Args:
+        iban (str): O código IBAN a validar.
+
+    Returns:
+        bool: True se o IBAN for matematicamente válido, False caso contrário.
+    &#34;&#34;&#34;
+    if not iban: return False
+    
+    CODIGO_PAIS_PT = &#39;PT&#39;
+    COMPRIMENTO_PT = 25
+    
+    iban = str(iban).strip().replace(&#39; &#39;, &#39;&#39;).upper()
+    
+    # Validação básica de estrutura
+    if len(iban) != COMPRIMENTO_PT or iban[:2] != CODIGO_PAIS_PT:
+        return False
+
+    # Reorganização para cálculo (PT50... -&gt; 50...PT)
+    iban_reorganizado = iban[4:] + iban[:4]
+    
+    def letra_para_digito(char):
+        # Converte letras em números (A=10, B=11, etc)
+        if &#39;A&#39; &lt;= char &lt;= &#39;Z&#39;:
+            return str(ord(char) - ord(&#39;A&#39;) + 10)
+        return char
+        
+    iban_digitalizado = &#34;&#34;.join(letra_para_digito(c) for c in iban_reorganizado)
+    
+    try:
+        # Algoritmo Modulo 97 check
+        numero_completo = int(iban_digitalizado)
+        return (numero_completo % 97) == 1
+    except ValueError:
+        return False</code></pre>
+</details>
+<div class="desc"><p>Valida um IBAN português utilizando o algoritmo Modulo 97-10.
+Assume que o IBAN deve começar por 'PT' e ter 25 caracteres.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>iban</code></strong> :&ensp;<code>str</code></dt>
+<dd>O código IBAN a validar.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True se o IBAN for matematicamente válido, False caso contrário.</dd>
+</dl></div>
+</dd>
+<dt id="src.validacao_ps2.valida_nif"><code class="name flex">
+<span>def <span class="ident">valida_nif</span></span>(<span>nif: str) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def valida_nif(nif: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Valida um Número de Identificação Fiscal (NIF) português.
+
+    Args:
+        nif (str): O NIF a validar.
+
+    Returns:
+        bool: True se for válido, False caso contrário.
+    &#34;&#34;&#34;
+    if not nif: return False
+    nif = str(nif).strip()
+    
+    # Verifica tamanho e se é numérico
+    if not nif.isdigit() or len(nif) != DIGITOS_NIF:
+        return False
+    
+    # Verifica se o último dígito corresponde ao cálculo de controlo
+    return nif[-1] == calcular_digito_controlo(nif[:DIGITOS_CONTROLO])</code></pre>
+</details>
+<div class="desc"><p>Valida um Número de Identificação Fiscal (NIF) português.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>nif</code></strong> :&ensp;<code>str</code></dt>
+<dd>O NIF a validar.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True se for válido, False caso contrário.</dd>
+</dl></div>
+</dd>
+<dt id="src.validacao_ps2.validar_dados"><code class="name flex">
+<span>def <span class="ident">validar_dados</span></span>(<span>lista_dados_geral: list) ‑> list</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validar_dados(lista_dados_geral: list) -&gt; list:
+    &#34;&#34;&#34;
+    Processa a lista de dados brutos e identifica ficheiros que não cumprem as regras de negócio.
+
+    **Regras Verificadas:**
+    1. Estrutura do ficheiro (1 Header, N Transações, 1 Footer).
+    2. Validade dos NIFs (Entidade e Clientes).
+    3. Validade dos IBANs.
+    4. Consistência dos totais monetários (Soma transações == Total Header/Footer que são o tipo 1 e tipo 9) .
+    5. Sequência lógica do número das operações.
+    6. Formatação de campos fixos (ex: tamanho do valor).
+
+    Args:
+        lista_dados_geral (list): Lista de dicionários retornada pelo módulo de leitura.
+                                  Cada dicionário deve conter a chave &#34;Origem&#34; (nome do ficheiro).
+
+    Returns:
+        list: Uma lista de strings contendo apenas os **nomes dos ficheiros inválidos**.
+              Retorna uma lista vazia `[]` se todos estiverem corretos.
+    &#34;&#34;&#34;
+    
+    lista_ficheiros_invalidos = []
+
+    # 1. AGRUPAR DADOS POR &#39;ORIGEM&#39;
+    # Cria um dicionário onde a chave é o nome do ficheiro e o valor é a lista de linhas desse ficheiro
+    dados_por_ficheiro = defaultdict(list)
+    
+    for linha in lista_dados_geral:
+        origem = linha.get(&#34;Origem&#34;, &#34;Desconhecido&#34;)
+        dados_por_ficheiro[origem].append(linha)
+    
+    # 2. ITERAR SOBRE CADA FICHEIRO ENCONTRADO
+    for nome_ficheiro, lista_dados in dados_por_ficheiro.items():
+        
+        ficheiro_atual_valido = True
+        
+        # --- PRÉ-PROCESSAMENTO (Cálculo de Totais e Contagens) ---
+        contadores_tipo = {&#39;1&#39;: 0, &#39;2&#39;: 0, &#39;9&#39;: 0}
+        soma_real_valor = Decimal(0)
+        valor_total_header = None
+        
+        for linha in lista_dados:
+            tipo = linha.get(&#34;Tipo Registo&#34;)
+            if tipo in contadores_tipo:
+                contadores_tipo[tipo] += 1
+            
+            # Captura valor do cabeçalho
+            if tipo == &#39;1&#39;:
+                try:
+                    valor_total_header = Decimal(linha.get(&#34;Valor total&#34;))
+                except: pass 
+
+            # Soma valores das transações
+            if tipo == &#39;2&#39;:
+                try:
+                    soma_real_valor += Decimal(linha.get(&#34;Valor&#34;))
+                except: pass
+
+        # --- VALIDAÇÃO ESTRUTURAL ---
+        # Regra: Tem de ter exatamente 1 cabeçalho, 1 rodapé e pelo menos 1 transação
+        if contadores_tipo[&#39;1&#39;] != 1:
+            ficheiro_atual_valido = False
+        
+        if contadores_tipo[&#39;9&#39;] != 1:
+            ficheiro_atual_valido = False
+
+        if contadores_tipo[&#39;2&#39;] &lt; 1:
+            ficheiro_atual_valido = False
+        
+        # Se a estrutura falhar, marca logo como inválido e salta para o próximo ficheiro
+        if not ficheiro_atual_valido:
+            lista_ficheiros_invalidos.append(nome_ficheiro)
+            continue 
+
+        # --- VALIDAÇÃO DE CONTEÚDO (LINHA A LINHA) ---
+        contador_ops = 0 
+        desc_base = None 
+
+        for i, linha in enumerate(lista_dados):
+            tipo = linha.get(&#34;Tipo Registo&#34;)
+            
+            # &gt;&gt;&gt;&gt; TIPO 1 (Cabeçalho)
+            if tipo == &#34;1&#34;:
+                # Valida NIF da Entidade
+                if not valida_nif(linha.get(&#34;NIF entidade&#34;)):
+                    ficheiro_atual_valido = False
+                
+                # Valida tamanho do campo Valor (tem de ser 14 chars)
+                val_str = str(linha.get(&#34;Valor total&#34;))
+                if len(val_str) != 14:
+                    ficheiro_atual_valido = False
+                
+                # Valida se o total declarado bate certo com a soma real
+                if valor_total_header is not None and valor_total_header != soma_real_valor:
+                    ficheiro_atual_valido = False
+
+            # &gt;&gt;&gt;&gt; TIPO 2 (Transações)
+            elif tipo == &#39;2&#39;:
+                contador_ops += 1
+                
+                # Valida Sequência (001, 002, ...)
+                num_op = linha.get(&#34;Nº operação&#34;)
+                esperado = str(contador_ops).zfill(3)
+                if num_op != esperado:
+                    ficheiro_atual_valido = False
+
+                # Valida NIF e IBAN do Cliente
+                if not valida_iban(linha.get(&#34;IBAN&#34;)):
+                    ficheiro_atual_valido = False
+                
+                if not valida_nif(linha.get(&#34;NIF Cliente&#34;)):
+                    ficheiro_atual_valido = False
+
+                # Valida consistência da Descrição (deve ser igual à primeira)
+                desc = linha.get(&#34;Descrição&#34;, &#34;&#34;).strip()
+                if contador_ops == 1:
+                    desc_base = desc
+                elif desc != desc_base:
+                    ficheiro_atual_valido = False
+
+            # &gt;&gt;&gt;&gt; TIPO 9 (Rodapé)
+            elif tipo == &#39;9&#39;:
+                try:
+                    val_footer = Decimal(linha.get(&#34;Valor total&#34;))
+                    qtd_footer = int(linha.get(&#34;Qtd Transações&#34;))
+                    
+                    # Valida se totais do rodapé batem com a realidade
+                    if val_footer != soma_real_valor:
+                        ficheiro_atual_valido = False
+                    
+                    if qtd_footer != contadores_tipo[&#39;2&#39;]:
+                        ficheiro_atual_valido = False
+                except:
+                    ficheiro_atual_valido = False
+
+        # Se após todas as verificações o ficheiro tiver falhas, adiciona à lista de erros
+        if not ficheiro_atual_valido:
+            lista_ficheiros_invalidos.append(nome_ficheiro)
+
+    return lista_ficheiros_invalidos</code></pre>
+</details>
+<div class="desc"><p>Processa a lista de dados brutos e identifica ficheiros que não cumprem as regras de negócio.</p>
+<p><strong>Regras Verificadas:</strong>
+1. Estrutura do ficheiro (1 Header, N Transações, 1 Footer).
+2. Validade dos NIFs (Entidade e Clientes).
+3. Validade dos IBANs.
+4. Consistência dos totais monetários (Soma transações == Total Header/Footer que são o tipo 1 e tipo 9) .
+5. Sequência lógica do número das operações.
+6. Formatação de campos fixos (ex: tamanho do valor).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>lista_dados_geral</code></strong> :&ensp;<code>list</code></dt>
+<dd>Lista de dicionários retornada pelo módulo de leitura.
+Cada dicionário deve conter a chave "Origem" (nome do ficheiro).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>Uma lista de strings contendo apenas os <strong>nomes dos ficheiros inválidos</strong>.
+Retorna uma lista vazia <code>[]</code> se todos estiverem corretos.</dd>
+</dl></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul>
+<li><a href="#modulo-de-validacao-ps2-validacao_ps2py">Módulo de Validação PS2 (validacao_ps2.py)</a><ul>
+<li><a href="#funcionalidades">Funcionalidades</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src" href="index.html">src</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="src.validacao_ps2.DIGITOS_CONTROLO" href="#src.validacao_ps2.DIGITOS_CONTROLO">DIGITOS_CONTROLO</a></code></li>
+<li><code><a title="src.validacao_ps2.DIGITOS_NIF" href="#src.validacao_ps2.DIGITOS_NIF">DIGITOS_NIF</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="src.validacao_ps2.calcular_digito_controlo" href="#src.validacao_ps2.calcular_digito_controlo">calcular_digito_controlo</a></code></li>
+<li><code><a title="src.validacao_ps2.valida_iban" href="#src.validacao_ps2.valida_iban">valida_iban</a></code></li>
+<li><code><a title="src.validacao_ps2.valida_nif" href="#src.validacao_ps2.valida_nif">valida_nif</a></code></li>
+<li><code><a title="src.validacao_ps2.validar_dados" href="#src.validacao_ps2.validar_dados">validar_dados</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>
