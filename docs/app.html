@@ -1,0 +1,765 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>app API documentation</title>
+<meta name="description" content="Dashboard Financeiro PS2 …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>app</code></h1>
+</header>
+<section id="section-intro">
+<h1 id="dashboard-financeiro-ps2">Dashboard Financeiro PS2</h1>
+<p>Este é o módulo principal da aplicação Shiny. Responsável por inicializar a interface,
+carregar os dados iniciais e definir toda a lógica reativa do servidor.</p>
+<h2 id="estrutura-da-aplicacao">Estrutura da Aplicação</h2>
+<p>A aplicação está dividida em:
+1.
+<strong>Carregamento Global:</strong> Leitura inicial dos dados ao arrancar o processo Python.
+2.
+<strong>Interface (UI):</strong> Definição do layout, barra lateral, filtros e cartões.
+3.
+<strong>Servidor:</strong> Lógica de filtragem, renderização de gráficos e gestão de estado.</p>
+<h2 id="dependencias-principais">Dependências Principais</h2>
+<ul>
+<li><code>shiny</code>: Framework web.</li>
+<li><code>pandas</code>: Manipulação de dados.</li>
+<li><code>matplotlib</code>: Geração de gráficos estáticos.</li>
+<li><code><a title="src" href="src/index.html">src</a></code>: Módulo local com funções auxiliares de leitura e validação.</li>
+</ul>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="app.dados_brutos"><code class="name">var <span class="ident">dados_brutos</span></code></dt>
+<dd>
+<div class="desc"><p>list: Lista crua de dicionários lida diretamente dos ficheiros na pasta data.</p></div>
+</dd>
+<dt id="app.dados_validos"><code class="name">var <span class="ident">dados_validos</span></code></dt>
+<dd>
+<div class="desc"><p>list: Lista filtrada contendo apenas os dados dos ficheiros considerados válidos.</p></div>
+</dd>
+<dt id="app.ficheiros_invalidos"><code class="name">var <span class="ident">ficheiros_invalidos</span></code></dt>
+<dd>
+<div class="desc"><p>list: Lista contendo os nomes dos ficheiros que não passaram na validação inicial.</p></div>
+</dd>
+<dt id="app.pacote"><code class="name">var <span class="ident">pacote</span></code></dt>
+<dd>
+<div class="desc"><p>dict: Dicionário contendo os DataFrames 'cabecalho', 'movimentos' e 'rodape'.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="app.server"><code class="name flex">
+<span>def <span class="ident">server</span></span>(<span>input, output, session)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def server(input, output, session):
+    &#34;&#34;&#34;
+    Função principal do servidor Shiny. Contém toda a lógica de negócio,
+    reatividade, filtragem e geração de gráficos.
+    &#34;&#34;&#34;
+
+    # --- 1. GESTÃO DE DADOS ---
+    # Container reativo para guardar os dados carregados e também invalidos
+    store_dados = reactive.Value(pacote)
+    store_invalidos = reactive.Value(ficheiros_invalidos)
+
+
+    # Função que carrega os dados do disco (ao iniciar e ao clicar no botão)
+    # Função que carrega os dados do disco (ao iniciar e ao clicar no botão)
+    @reactive.effect
+    @reactive.event(input.btn_atualizar, ignore_init=True)
+    def carregar_dados_do_disco():
+        &#34;&#34;&#34;
+        Reage ao botão &#39;Atualizar Dados&#39;. 
+        Lê novamente a pasta &#39;data&#39;, valida os ficheiros, filtra os inválidos,
+        atualiza os dados reativos (stores) e atualiza os dropdowns da UI.
+        &#34;&#34;&#34;
+        # Guardamos o ID da notificação numa variável
+        id_notificacao = ui.notification_show(&#34;A ler ficheiros...&#34;, type=&#34;message&#34;, duration=None)
+        
+        try:
+            print(&#34;--- A CARREGAR DADOS ---&#34;)
+            # Ler novamente da pasta
+            novos_dados_brutos = ler_ficheiros_ps2() 
+
+            # Nova validação, pois podem ter entrado ficheiros invalidos
+            lista_erros = validar_dados(novos_dados_brutos)
+            store_invalidos.set(lista_erros) # guardar na memória reativa
+
+            # Se houver erros, avisar imeatamente
+            if lista_erros:
+                msg = f&#34;Atenção: Foram detetados {len(lista_erros)} ficheiros inválidos!&#34;
+                ui.notification_show(msg, type=&#34;warning&#34;, duration=5)
+            
+            # FILTRAGEM - Lista apenas com os ficheiros que passaram na validação
+            dados_validos = [
+                dado for dado in novos_dados_brutos
+                if dado.get(&#34;Origem&#34;) not in lista_erros
+            ]
+
+            # Converter para pandas e guardar os válidos
+            novo_pacote = converterParaPandas(dados_validos)
+            store_dados.set(novo_pacote)
+            
+            # Atualizar os Filtros da UI dinamicamente
+            df_cab = novo_pacote[&#34;cabecalho&#34;]
+            if not df_cab.empty:
+                # Atualizar Entidades
+                ents = [&#34;Todas&#34;] + sorted(df_cab[&#34;Entidade&#34;].unique().tolist())
+                ui.update_select(&#34;filtro_entidade&#34;, choices=ents, selected=&#34;Todas&#34;)
+                
+                # Atualizar Ficheiros
+                fichs = [&#34;Todos&#34;] + sorted(df_cab[&#34;Origem&#34;].unique().tolist())
+                ui.update_select(&#34;filtro_ficheiro&#34;, choices=fichs, selected=&#34;Todos&#34;)
+                
+                # Atualizar Calendário
+                if &#34;Data&#34; in df_cab.columns:
+                    datas_dt = pd.to_datetime(df_cab[&#34;Data&#34;])
+                    min_d = datas_dt.min().date()
+                    max_d = datas_dt.max().date()
+                    ui.update_date_range(&#34;filtro_data&#34;, min=min_d, max=max_d, start=min_d, end=max_d)
+
+                ui.notification_show(&#34;Dados atualizados com sucesso!&#34;, type=&#34;message&#34;, duration=3)
+
+        except Exception as e:
+            ui.notification_show(f&#34;Erro: {e}&#34;, type=&#34;error&#34;)
+            print(f&#34;ERRO: {e}&#34;)
+            
+        finally:
+            # Fechar notificação
+            ui.notification_remove(id_notificacao)
+
+        
+
+    @reactive.effect
+    @reactive.event(input.btn_notificacoes)
+    def mostrar_janela_erros():
+        &#34;&#34;&#34;
+        Reage ao clique no botão de notificações (sino).
+        Abre uma janela modal com a lista de ficheiros inválidos, se existirem.
+        &#34;&#34;&#34;
+        # Vamos buscar a lista atual de erros
+        erros = store_invalidos()
+        
+        if erros:
+            # CASO A: Existem erros -&gt; Mostra Janela (Modal)
+            ui.modal_show(
+                ui.modal(
+                    ui.div(
+                        ui.h4(&#34;Ficheiros Rejeitados&#34;, style=&#34;color: #dc3545; margin-top:0;&#34;),
+                        ui.p(&#34;Os seguintes ficheiros não respeitam o formato PS2 ou contêm erros de estrutura:&#34;),
+                        ui.hr(),
+                        
+                        # Cria uma lista HTML (Bullet points) dinâmica
+                        ui.tags.ul(
+                            # Loop que cria um &lt;li&gt; para cada ficheiro na lista
+                            [ui.tags.li(nome, style=&#34;color: #dc3545; font-weight: bold;&#34;) for nome in erros]
+                        ),
+                        
+                        ui.hr(),
+                        ui.p(&#34;Nota: Estes ficheiros foram ignorados e não constam nos gráficos.&#34;, style=&#34;font-size: 0.9em; color: gray;&#34;)
+                    ),
+                    title=&#34;Alertas do Sistema&#34;,
+                    easy_close=True,
+                    footer=ui.modal_button(&#34;Fechar&#34;)
+                )
+            )
+        # else:
+        #     # CASO B: Não existem erros -&gt; Notificação Verde
+        #     ui.notification_show(&#34;Tudo operacional! Não existem ficheiros inválidos.&#34;, type=&#34;message&#34;, duration=3)
+
+
+
+    # NOVO: Controlar a animação sem redesenhar o botão
+    # NOTA: Adicionámos &#39;async&#39; antes do def
+    @reactive.effect
+    async def controlar_animacao_botao():
+        &#34;&#34;&#34;
+        Efeito assíncrono que monitoriza a lista de ficheiros inválidos.
+        Envia uma mensagem personalizada (JavaScript) para ativar ou desativar
+        a classe CSS de animação do botão de notificações.
+        &#34;&#34;&#34;
+        # Lemos a lista de erros
+        erros = store_invalidos()
+        
+        # Calculamos se deve ter animação
+        tem_erro = True if erros else False
+        
+        
+        # O print ajuda a confirmar no terminal se a função está a correr
+        # print(f&#34;DEBUG: Atualizar botão. Tem erros? {tem_erro}&#34;) 
+        
+        # NOTA: Adicionámos &#39;await&#39; aqui. É isto que faz a mensagem sair!
+        await session.send_custom_message(
+            &#34;gerir_animacao_sino&#34;, 
+            {&#34;id&#34;: &#34;btn_notificacoes&#34;, &#34;ativar&#34;: tem_erro}
+        )
+
+
+    # --- 2. CÁLCULOS E FILTROS ---
+    @reactive.calc
+    def dados_filtrados():
+        &#34;&#34;&#34;
+        Cálculo reativo central. Aplica os filtros selecionados pelo utilizador
+        (Data, Entidade, Ficheiro) aos dados globais e retorna um dicionário
+        com os DataFrames filtrados.
+        &#34;&#34;&#34;
+        # Ler do nosso container reativo
+        pacote = store_dados()
+        
+        if pacote is None:
+            # Retorna dataframes vazios se ainda não carregou
+            return {&#34;cab&#34;: pd.DataFrame(), &#34;mov&#34;: pd.DataFrame(), &#34;rod&#34;: pd.DataFrame()}
+
+        df_cabecalho = pacote[&#34;cabecalho&#34;]
+        df_movimentos = pacote[&#34;movimentos&#34;]
+        df_rodape = pacote[&#34;rodape&#34;]
+
+        # Ler inputs
+        entidade = input.filtro_entidade()
+        ficheiro = input.filtro_ficheiro()
+        usar_datas = input.ativar_filtro_data()
+        datas = input.filtro_data()
+
+        cab = df_cabecalho.copy()
+        
+        # 1. FILTRO DE DATA
+        if not cab.empty and usar_datas and datas:
+            start_date, end_date = datas
+            # Garante datetime
+            cab[&#34;Data&#34;] = pd.to_datetime(cab[&#34;Data&#34;])
+            mask = (cab[&#34;Data&#34;].dt.date &gt;= start_date) &amp; (cab[&#34;Data&#34;].dt.date &lt;= end_date)
+            cab = cab.loc[mask]
+
+        # 2. FILTRO DE ENTIDADE
+        if entidade != &#34;Todas&#34;:
+            cab = cab[cab[&#34;Entidade&#34;] == entidade]
+
+        # 3. FILTRO DE FICHEIRO
+        if ficheiro != &#34;Todos&#34;:
+            cab = cab[cab[&#34;Origem&#34;] == ficheiro]
+
+        # Propagação
+        ficheiros_validos = cab[&#34;Origem&#34;].unique()
+        mov = df_movimentos[df_movimentos[&#34;Origem&#34;].isin(ficheiros_validos)]
+        rod = df_rodape[df_rodape[&#34;Origem&#34;].isin(ficheiros_validos)]
+
+        return {&#34;cab&#34;: cab, &#34;mov&#34;: mov, &#34;rod&#34;: rod}
+    
+    # -------------------------------------
+    # --- TABELAS ---
+    # -------------------------------------
+
+    @render.data_frame
+    def tabela_cabecalho():
+        &#34;&#34;&#34;Renderiza a tabela de cabeçalhos (Tipo 1).&#34;&#34;&#34;
+        df = dados_filtrados()[&#34;cab&#34;].copy()
+        if not df.empty and &#34;Data&#34; in df.columns:
+            # Converter para datetime só para garantir, caso venha string
+            df[&#34;Data&#34;] = pd.to_datetime(df[&#34;Data&#34;]) 
+            df[&#34;Data&#34;] = df[&#34;Data&#34;].dt.strftime(&#39;%d/%m/%Y&#39;)
+        return render.DataGrid(df, filters=True)
+
+    @render.data_frame
+    def tabela_movimentos():
+        &#34;&#34;&#34;Renderiza a tabela de movimentos (Tipo 2).&#34;&#34;&#34;
+        return render.DataGrid(dados_filtrados()[&#34;mov&#34;], filters=True)
+
+    @render.data_frame
+    def tabela_rodape():
+        &#34;&#34;&#34;Renderiza a tabela de rodapés/totais (Tipo 9).&#34;&#34;&#34;
+        return render.DataGrid(dados_filtrados()[&#34;rod&#34;], filters=True)
+    
+    @render.text
+    def texto_total_registos():
+        &#34;&#34;&#34;Renderiza o texto de resumo (nº docs e total euros) na barra lateral.&#34;&#34;&#34;
+        dados = dados_filtrados()
+        num_docs = len(dados[&#39;cab&#39;])
+        total_euros = 0.0
+        if not dados[&#39;cab&#39;].empty and &#34;Valor total&#34; in dados[&#39;cab&#39;].columns:
+            total_euros = dados[&#39;cab&#39;][&#34;Valor total&#34;].sum()
+        return f&#34;{num_docs} documentos | Total: {total_euros:,.2f} €&#34;
+
+    # ---------------------------------------
+    # --- LÓGICA DOS GRÁFICOS ---    
+    # ---------------------------------------
+
+    @render.plot
+    def grafico_barras_entidade():
+        &#34;&#34;&#34;Gráfico de barras VERTICAIS com cores diferentes, RÓTULOS e TÍTULO DINÂMICO&#34;&#34;&#34;
+        df = dados_filtrados()[&#34;cab&#34;]
+        
+        # Verificação de segurança
+        if df.empty or &#34;Valor total&#34; not in df.columns or &#34;Entidade&#34; not in df.columns:
+            fig, ax = plt.subplots()
+            ax.text(0.5, 0.5, &#34;Sem dados para exibir&#34;, ha=&#39;center&#39;)
+            return fig
+
+        # 1. Agrupar, Somar e Ordenar
+        soma_entidade = df.groupby(&#34;Entidade&#34;)[&#34;Valor total&#34;].sum().sort_values(ascending=False)
+        
+        # 2. Top 15
+        if len(soma_entidade) &gt; 15:
+            soma_entidade = soma_entidade.head(15)
+
+        # 3. Criar a figura
+        fig, ax = plt.subplots(figsize=(12, 7))
+        
+        # --- CORES ---
+        num_barras = len(soma_entidade)
+        cmap = plt.get_cmap(&#39;tab20&#39;) 
+        lista_cores = [cmap(i) for i in np.linspace(0, 1, num_barras)]
+
+        # 4. Gerar o gráfico
+        bars = ax.bar(soma_entidade.index, soma_entidade.values, color=lista_cores)
+
+        # 5. Adicionar valores no topo
+        ax.bar_label(bars, fmt=&#39;€%.2f&#39;, padding=3, fontsize=9)
+        
+        # --- LÓGICA DO TÍTULO DINÂMICO ---
+        
+        # Ler os inputs para saber se há filtros ativos
+        entidade_selecionada = input.filtro_entidade()
+        ficheiro_selecionado = input.filtro_ficheiro()
+
+        # Condição: Só mostra &#34;(Top 15)&#34; se NÃO houver filtros específicos
+        if entidade_selecionada == &#34;Todas&#34; and ficheiro_selecionado == &#34;Todos&#34;:
+            titulo_base = &#34;Total Cobrado por Entidade (Top 15)&#34;
+        else:
+            titulo_base = &#34;Total Cobrado&#34; # Removemos a menção ao Top 15
+
+        # Lógica de Datas
+        if input.ativar_filtro_data():
+            datas = input.filtro_data()
+            if datas:
+                start, end = datas
+                s_str = start.strftime(&#39;%d/%m/%Y&#39;)
+                e_str = end.strftime(&#39;%d/%m/%Y&#39;)
+                titulo_final = f&#34;{titulo_base} - {s_str} a {e_str}&#34;
+            else:
+                titulo_final = titulo_base
+        else:
+            titulo_final = titulo_base
+
+        # 6. Formatação
+        ax.set_title(titulo_final, fontsize=12, pad=15)
+        ax.set_xlabel(&#34;Entidade&#34;)
+        ax.set_ylabel(&#34;Valor Total (€)&#34;)
+        
+        ax.set_ylim(top=soma_entidade.values.max() * 1.1)
+        ax.grid(axis=&#39;y&#39;, linestyle=&#39;--&#39;, alpha=0.5)
+        
+        plt.xticks(rotation=45, ha=&#39;right&#39;)
+        plt.tight_layout()
+        
+        return fig
+
+
+
+
+    @render.plot
+    def grafico_linha_tempo():
+        &#34;&#34;&#34;Gráfico de Linhas Múltiplas: Uma linha por Entidade (Top 5)&#34;&#34;&#34;
+        df = dados_filtrados()[&#34;cab&#34;]
+        
+        # 1. Verificação de segurança
+        if df.empty or &#34;Valor total&#34; not in df.columns:
+            fig, ax = plt.subplots()
+            ax.text(0.5, 0.5, &#34;Sem dados para exibir&#34;, ha=&#39;center&#39;)
+            return fig
+
+        # 2. PREPARAÇÃO DOS DADOS
+        # Nota: Mantemos o filtro Top 5 na lógica de dados para garantir que o gráfico 
+        # não fica ilegível se selecionar um ficheiro com 50 entidades, por exemplo.
+        top_entidades = df.groupby(&#34;Entidade&#34;)[&#34;Valor total&#34;].sum().nlargest(5).index.tolist()
+        df_top = df[df[&#34;Entidade&#34;].isin(top_entidades)]
+        
+        # Agrupar por Data (Mês) e Entidade
+        df_pivot = df_top.set_index(&#34;Data&#34;).groupby([pd.Grouper(freq=&#39;ME&#39;), &#39;Entidade&#39;])[&#34;Valor total&#34;].sum().unstack(fill_value=0)
+
+        # 3. Criar a figura
+        fig, ax = plt.subplots(figsize=(12, 6))
+        
+        # 4. Desenhar as Linhas
+        cmap = plt.get_cmap(&#39;tab10&#39;)
+        
+        for i, entidade in enumerate(df_pivot.columns):
+            ax.plot(df_pivot.index, df_pivot[entidade], 
+                    marker=&#39;o&#39;, linestyle=&#39;-&#39;, linewidth=2, 
+                    label=entidade, color=cmap(i)) 
+
+        # 5. Formatar Datas em Português
+        def formatar_data_pt(x, pos):
+            dt = mdates.num2date(x)
+            meses = {1: &#39;Jan&#39;, 2: &#39;Fev&#39;, 3: &#39;Mar&#39;, 4: &#39;Abr&#39;, 5: &#39;Mai&#39;, 6: &#39;Jun&#39;,
+                     7: &#39;Jul&#39;, 8: &#39;Ago&#39;, 9: &#39;Set&#39;, 10: &#39;Out&#39;, 11: &#39;Nov&#39;, 12: &#39;Dez&#39;}
+            return f&#34;{meses[dt.month]}/{str(dt.year)[2:]}&#34;
+
+        ax.xaxis.set_major_locator(mdates.MonthLocator())
+        ax.xaxis.set_major_formatter(plt.FuncFormatter(formatar_data_pt))
+        
+        # 6. Formatar Valores (Eixo Y)
+        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f&#39;€{x:,.0f}&#39;))
+
+        # 7. --- TÍTULO DINÂMICO ---
+        
+        entidade_selecionada = input.filtro_entidade()
+        ficheiro_selecionado = input.filtro_ficheiro()
+
+        # Se não houver filtros, especificamos que é o Top 5.
+        # Se houver filtros, usamos um título genérico.
+        if entidade_selecionada == &#34;Todas&#34; and ficheiro_selecionado == &#34;Todos&#34;:
+            titulo_base = &#34;Evolução Mensal (Top 5 Entidades)&#34;
+        else:
+            titulo_base = &#34;Evolução Mensal das Cobranças&#34;
+
+        # Adicionar datas ao título
+        if input.ativar_filtro_data():
+            datas = input.filtro_data()
+            if datas:
+                start, end = datas
+                s_str = start.strftime(&#39;%d/%m/%Y&#39;)
+                e_str = end.strftime(&#39;%d/%m/%Y&#39;)
+                titulo_final = f&#34;{titulo_base} - {s_str} a {e_str}&#34;
+            else:
+                titulo_final = titulo_base
+        else:
+            titulo_final = titulo_base
+
+        ax.set_title(titulo_final, fontsize=12, pad=15)
+        ax.set_ylabel(&#34;Valor Cobrado (€)&#34;)
+        ax.grid(True, linestyle=&#39;--&#39;, alpha=0.5)
+        
+        ax.legend(title=&#34;Entidade&#34;, bbox_to_anchor=(1.02, 1), loc=&#39;upper left&#39;)
+        
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+
+        return fig
+    
+
+
+    
+    @render.plot
+    def grafico_evolucao_temporal():
+        &#34;&#34;&#34;Gráfico de evolução temporal (diária ou mensal) - Simples&#34;&#34;&#34;
+        df = dados_filtrados()[&#34;cab&#34;]
+        
+        # 1. Verificação de segurança
+        if df.empty or &#34;Valor total&#34; not in df.columns:
+            fig, ax = plt.subplots()
+            ax.text(0.5, 0.5, &#34;Sem dados para exibir&#34;, ha=&#39;center&#39;)
+            return fig
+
+        # 2. Agrupar por Data e Somar
+        df = df.sort_values(&#34;Data&#34;)
+        soma_tempo = df.groupby(&#34;Data&#34;)[&#34;Valor total&#34;].sum()
+
+        # 3. Criar Figura
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.plot(soma_tempo.index, soma_tempo.values, marker=&#39;o&#39;, linestyle=&#39;-&#39;, color=&#39;#55a868&#39;)
+
+        # 4. Formatação do Eixo X
+        ax.xaxis.set_major_formatter(mdates.DateFormatter(&#39;%d/%m/%y&#39;))
+        ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+        
+        # 5. --- LÓGICA DO TÍTULO DINÂMICO ---
+        titulo_base = &#34;Evolução das Cobranças&#34;
+        
+        if input.ativar_filtro_data():
+            datas = input.filtro_data()
+            if datas:
+                start, end = datas
+                # Formatar datas para Dia/Mês/Ano
+                s_str = start.strftime(&#39;%d/%m/%Y&#39;)
+                e_str = end.strftime(&#39;%d/%m/%Y&#39;)
+                titulo_final = f&#34;{titulo_base} - {s_str} a {e_str}&#34;
+            else:
+                titulo_final = titulo_base
+        else:
+            titulo_final = titulo_base
+
+        # Aplicar Título e Eixos
+        ax.set_title(titulo_final, fontsize=12, pad=15)
+        ax.set_ylabel(&#34;Valor (€)&#34;)
+        
+        # Formatar Eixo Y em Euros (opcional, mas fica bem)
+        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f&#39;€{x:,.0f}&#39;))
+
+        ax.grid(True, linestyle=&#39;--&#39;, alpha=0.5)
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        
+        return fig
+    
+
+
+
+    @render.plot
+    def grafico_histograma_valores():
+        &#34;&#34;&#34;Histograma: Distribuição dos montantes com linha de Média&#34;&#34;&#34;
+        df = dados_filtrados()[&#34;cab&#34;]
+        
+        # 1. Segurança
+        if df.empty or &#34;Valor total&#34; not in df.columns:
+            fig, ax = plt.subplots()
+            ax.text(0.5, 0.5, &#34;Sem dados para exibir&#34;, ha=&#39;center&#39;)
+            return fig
+
+        # 2. Dados
+        valores = df[&#34;Valor total&#34;]
+        ticket_medio = valores.mean()
+        
+        # 3. Criar Figura
+        fig, ax = plt.subplots(figsize=(10, 6))
+        
+        # 4. Desenhar Histograma
+        # bins=30: Divide os dados em 30 &#34;gavetas&#34; ou faixas de valor
+        # color=&#39;#17a2b8&#39;: Um azul-petróleo para distinguir dos outros gráficos
+        # edgecolor=&#39;white&#39;: Cria linhas brancas entre as barras para facilitar a leitura
+        n, bins, patches = ax.hist(valores, bins=30, color=&#39;#17a2b8&#39;, edgecolor=&#39;white&#39;, alpha=0.9)
+
+        # 5. Adicionar Linha do Ticket Médio (Vermelha Tracejada)
+        ax.axvline(ticket_medio, color=&#39;#d9534f&#39;, linestyle=&#39;--&#39;, linewidth=2, label=f&#39;Cobrança média: €{ticket_medio:,.2f}&#39;)
+
+        # 6. Título Dinâmico
+        titulo_base = &#34;Frequência por Faixa de Valor&#34;
+        if input.ativar_filtro_data():
+            datas = input.filtro_data()
+            if datas:
+                start, end = datas
+                s_str = start.strftime(&#39;%d/%m/%Y&#39;)
+                e_str = end.strftime(&#39;%d/%m/%Y&#39;)
+                titulo_final = f&#34;{titulo_base} ({s_str} a {e_str})&#34;
+            else:
+                titulo_final = titulo_base
+        else:
+            titulo_final = titulo_base
+
+        # 7. Formatação
+        ax.set_title(titulo_final, fontsize=12, pad=15)
+        ax.set_xlabel(&#34;Valor da Cobrança (€)&#34;)
+        ax.set_ylabel(&#34;Quantidade de Documentos&#34;)
+        
+        # Formatar eixo X em Euros
+        ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f&#39;€{x:,.0f}&#39;))
+        
+        ax.grid(axis=&#39;y&#39;, linestyle=&#39;--&#39;, alpha=0.5)
+        
+        # Adicionar a legenda (para mostrar o valor da média)
+        ax.legend()
+        
+        plt.tight_layout()
+        return fig
+
+
+
+    @render.plot
+    def grafico_pareto_clientes():
+        &#34;&#34;&#34;Diagrama de Pareto: Barras (Valor) + Linha (% Acumulada)&#34;&#34;&#34;
+        dados = dados_filtrados()
+        df_mov = dados[&#34;mov&#34;]
+        
+        # 1. Segurança e Preparação
+        if df_mov.empty or &#34;Valor&#34; not in df_mov.columns or &#34;NIF Cliente&#34; not in df_mov.columns:
+            fig, ax = plt.subplots()
+            ax.text(0.5, 0.5, &#34;Sem movimentos para exibir&#34;, ha=&#39;center&#39;)
+            return fig
+
+        # Garantir que o valor é numérico
+        df_mov[&#34;Valor&#34;] = pd.to_numeric(df_mov[&#34;Valor&#34;], errors=&#39;coerce&#39;).fillna(0)
+
+        # 2. Agrupar por NIF Cliente
+        pareto_df = df_mov.groupby(&#34;NIF Cliente&#34;)[&#34;Valor&#34;].sum().sort_values(ascending=False)
+        
+        # Filtrar Top 20
+        top_n = 20
+        if len(pareto_df) &gt; top_n:
+            pareto_df = pareto_df.head(top_n)
+
+        # 3. Calcular Percentagem Acumulada
+        total_geral = pareto_df.sum() 
+        cum_percentage = pareto_df.cumsum() / total_geral * 100
+
+        # 4. Criar Figura e Eixo Principal (Barras)
+        fig, ax1 = plt.subplots(figsize=(12, 7))
+        
+        ax1.bar(pareto_df.index, pareto_df.values, color=&#34;#4c72b0&#34;, label=&#34;Valor Cobrado&#34;)
+        ax1.set_ylabel(&#34;Valor Cobrado (€)&#34;, color=&#34;#4c72b0&#34;, fontweight=&#39;bold&#39;)
+        ax1.tick_params(axis=&#39;y&#39;, labelcolor=&#34;#4c72b0&#34;)
+        ax1.set_xlabel(&#34;NIF Cliente&#34;)
+        
+        # Formatar Eixo Y1 em Euros
+        ax1.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f&#39;€{x:,.0f}&#39;))
+
+        # 5. Criar Eixo Secundário (Linha)
+        ax2 = ax1.twinx()
+        
+        ax2.plot(pareto_df.index, cum_percentage.values, color=&#34;#c44e52&#34;, marker=&#34;o&#34;, linewidth=2, label=&#34;% Acumulada&#34;)
+        ax2.set_ylabel(&#34;Percentagem Acumulada&#34;, color=&#34;#c44e52&#34;, fontweight=&#39;bold&#39;)
+        ax2.tick_params(axis=&#39;y&#39;, labelcolor=&#34;#c44e52&#34;)
+        
+        # Formatar Eixo Y2 em Percentagem
+        ax2.yaxis.set_major_formatter(PercentFormatter())
+        ax2.set_ylim(0, 110)
+
+        # 6. Linha de Referência dos 80%
+        ax2.axhline(80, color=&#34;gray&#34;, linestyle=&#34;--&#34;, linewidth=1, alpha=0.7)
+        ax2.text(len(pareto_df)-1, 80, &#39; Regra 80%&#39;, va=&#39;center&#39;, ha=&#39;left&#39;, color=&#34;gray&#34;, fontsize=9)
+
+        # 7. Título Dinâmico
+        titulo_base = f&#34;Top {top_n} Clientes (Pareto)&#34;
+        if input.ativar_filtro_data():
+            datas = input.filtro_data()
+            if datas:
+                start, end = datas
+                s_str = start.strftime(&#39;%d/%m/%Y&#39;)
+                e_str = end.strftime(&#39;%d/%m/%Y&#39;)
+                titulo_final = f&#34;{titulo_base} - {s_str} a {e_str}&#34;
+            else:
+                titulo_final = titulo_base
+        else:
+            titulo_final = titulo_base
+
+        plt.title(titulo_final, fontsize=12, pad=20)
+        
+        # Rodar labels do eixo X
+        ax1.set_xticklabels(pareto_df.index, rotation=45, ha=&#39;right&#39;)
+        
+        plt.tight_layout()
+        return fig
+    
+
+    # -----------------------------------
+    # --- CHECKBOX DINAMICAS
+    # -----------------------------------
+
+    @reactive.effect
+    def gerir_opcoes_graficos():
+        &#34;&#34;&#34;
+        Efeito que monitoriza a seleção de Entidade e Ficheiro.
+        Se os filtros estiverem em &#39;Todas&#39;/&#39;Todos&#39;, mostra a opção de &#39;Evolução Global&#39;.
+        Se houver filtros específicos, esconde essa opção para não gerar gráficos redundantes.
+        &#34;&#34;&#34;
+        # 1. Ler os filtros
+        entidade = input.filtro_entidade()
+        ficheiro = input.filtro_ficheiro()
+
+        # 2. Ler seleção atual de forma isolada (para não criar ciclo infinito)
+        with reactive.isolate():
+            selecao_atual = list(input.selecao_graficos())
+
+        # 3. Lógica de atualização
+        if entidade == &#34;Todas&#34; and ficheiro == &#34;Todos&#34;:
+            # CASO 1: Mostrar &#34;Evolução Global&#34;
+            novas_opcoes = {
+                &#34;g_barras&#34;: &#34;Top Entidades&#34;,
+                &#34;g_linhas&#34;: &#34;Evolução Mensal&#34;,
+                &#34;g_linhas_global&#34;: &#34;Evolução Global&#34;, 
+                &#34;g_hist&#34;: &#34;Histograma&#34;,
+                &#34;g_pareto&#34;: &#34;Pareto&#34;
+            }
+            
+            # --- O TRUQUE ESTÁ AQUI ---
+            # Se a opção global não estiver selecionada, adicionamo-la manualmente
+            if &#34;g_linhas_global&#34; not in selecao_atual:
+                selecao_atual.append(&#34;g_linhas_global&#34;)
+            # --------------------------
+
+        else:
+            # CASO 2: Esconder &#34;Evolução Global&#34;
+            novas_opcoes = {
+                &#34;g_barras&#34;: &#34;Top Entidades&#34;,
+                &#34;g_linhas&#34;: &#34;Evolução Mensal&#34;,
+                &#34;g_hist&#34;: &#34;Histograma&#34;,
+                &#34;g_pareto&#34;: &#34;Pareto&#34;
+            }
+            
+            # Removemos da seleção para não causar erros (pois a opção deixou de existir)
+            if &#34;g_linhas_global&#34; in selecao_atual:
+                selecao_atual.remove(&#34;g_linhas_global&#34;)
+
+        # 4. Atualizar o Input
+        ui.update_checkbox_group(
+            &#34;selecao_graficos&#34;,
+            choices=novas_opcoes,
+            selected=selecao_atual # Enviamos a lista corrigida
+        )</code></pre>
+</details>
+<div class="desc"><p>Função principal do servidor Shiny. Contém toda a lógica de negócio,
+reatividade, filtragem e geração de gráficos.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul>
+<li><a href="#dashboard-financeiro-ps2">Dashboard Financeiro PS2</a><ul>
+<li><a href="#estrutura-da-aplicacao">Estrutura da Aplicação</a></li>
+<li><a href="#dependencias-principais">Dependências Principais</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="app.dados_brutos" href="#app.dados_brutos">dados_brutos</a></code></li>
+<li><code><a title="app.dados_validos" href="#app.dados_validos">dados_validos</a></code></li>
+<li><code><a title="app.ficheiros_invalidos" href="#app.ficheiros_invalidos">ficheiros_invalidos</a></code></li>
+<li><code><a title="app.pacote" href="#app.pacote">pacote</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="app.server" href="#app.server">server</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>
