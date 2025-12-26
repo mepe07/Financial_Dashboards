@@ -181,14 +181,6 @@ app_ui = ui.page_sidebar(
                     #style="display: flex; align-items: center; justify-content: center; padding: 0;"
                 ),
                 
-                # ui.input_action_button(
-                #     "btn_notificacoes_placeholder", 
-                #     "Notificações", 
-                #     icon=icon_svg("bell"), 
-                #     class_="btn-secondary",
-                #     # style="display: flex; align-items: center; justify-content: center; padding: 0;"
-                # ),
-                #ui.output_ui("render_botao_notificacoes"),
 
                 style="display: flex; gap: 10px;"
 
