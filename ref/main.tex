@@ -1,58 +1,88 @@
 \documentclass[12pt, a4paper]{article}
 
-% --- PACOTES ---
+% --- PACOTES FUNDAMENTAIS ---
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[portuguese]{babel}
+\usepackage[portuguese]{babel} % Ajusta para PT-PT automaticamente
 \usepackage{graphicx}      % Para imagens
 \usepackage{geometry}      % Para margens
 \usepackage{setspace}      % Para espaçamento entre linhas
-\usepackage{mathptmx}      % Usa a fonte Times New Roman (padrão académico)
+\usepackage{mathptmx}      % Fonte Times New Roman (padrão académico)
+\usepackage{indentfirst}   % Indenta o primeiro parágrafo de cada secção
+\usepackage{float}         % Para posicionar imagens com 'H' (Here)
+\usepackage[hidelinks]{hyperref} % Cria links no índice e referências
+\usepackage{csquotes}      % Para citações formais
 
-% Configuração das Margens (Padrão ABNT/Universitário)
+% --- CONFIGURAÇÃO DE CÓDIGO (LISTINGS) ---
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Cores estilo VS Code para o código Python
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize, % Fonte tipo máquina de escrever
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=Python,
+    % --- CORREÇÃO DO ERRO UTF-8 AQUI ---
+    % Isto ensina o listings a aceitar acentos portugueses
+    literate={á}{{\'a}}1 {à}{{\`a}}1 {ã}{{\~a}}1 {é}{{\'e}}1 {ê}{{\^e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {õ}{{\~o}}1 {ú}{{\'u}}1 {ç}{{\c{c}}}1 {Á}{{\'A}}1 {À}{{\`A}}1 {Ã}{{\~A}}1 {É}{{\'E}}1 {Ê}{{\^E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Õ}{{\~O}}1 {Ú}{{\'U}}1 {Ç}{{\c{C}}}1
+}
+\lstset{style=mystyle}
+
+% --- CONFIGURAÇÃO DAS MARGENS ---
 \geometry{
     top=3cm,
     bottom=2cm,
     left=3cm,
     right=2cm
 }
+\onehalfspacing % Espaçamento 1.5 entre linhas (comum em teses)
 
+% ====================================================================
+%                             DOCUMENTO
+% ====================================================================
 \begin{document}
 
-% --- INÍCIO DA CAPA ---
+% --- CAPA ---
 \begin{titlepage}
-    \centering % Tudo centrado
-    
-    % 1. NOME DA INSTITUIÇÃO (Em maiúsculas e negrito)
+    \centering
     {\scshape\LARGE Instituto Politécnico do Cávado e do Ave \par}
     {\scshape\Large Escola Superior de Tecnologia \par}
+    \vspace{1cm}
     
-    \vspace{1cm} % Espaço vertical
+    % Se não tiveres imagem, comenta a linha abaixo com %
+    % \includegraphics[width=0.4\textwidth]{example-image} 
+    \vspace{1.5cm} % Espaço extra se não houver imagem
     
-    % 2. LOGÓTIPO
-    % Se tiver o seu logo, use: \includegraphics[width=0.4\textwidth]{logo.png}
-    % Por enquanto, uso 'example-image' para testar
-    \includegraphics[width=0.4\textwidth]{logo.png}
-    
-    \vspace{1.5cm}
-    
-    % 3. CURSO E DISCIPLINA
-    {\large \textbf{Licenciatura em Engenharia de Sistemas Informática} \par}
+    {\large \textbf{Licenciatura em Engenharia de Sistemas Informáticos} \par}
     {\large Unidade Curricular: Laboratórios de Informática \par}
     
-    \vspace{3cm} % Espaço grande até o título
-    
-    % 4. TÍTULO DO TRABALHO
-    % A regra cria uma linha horizontal bonita
+    \vspace{3cm}
     \rule{\linewidth}{0.5mm} \\[0.4cm]
     {\huge \bfseries Processamento e Análise de \par Ficheiros PS2 \par}
     \rule{\linewidth}{0.5mm} \\[0.5cm]
+    {\Large \itshape Relatório Técnico do Projeto}
     
-    {\Large \itshape Relatório Técnico}
+    \vfill
     
-    \vfill % Empurra o resto para o fundo da página
-    
-    % 5. AUTORES E ORIENTADOR
     \begin{minipage}{0.45\textwidth}
         \begin{flushleft} \large
             \textbf{Elaborado por:}\\
@@ -69,25 +99,110 @@
     \end{minipage}
     
     \vspace{2cm}
-    
-    % 6. LOCAL E DATA
     {\large \textbf{Barcelos} \\ \today}
-    
 \end{titlepage}
-% --- FIM DA CAPA ---
 
-% Começa uma nova página para o conteúdo
+% --- RESUMO ---
 \newpage
+\thispagestyle{empty} 
+\section*{Resumo}
+Este projeto visa o desenvolvimento de uma aplicação web interativa para o processamento, validação e análise visual de ficheiros financeiros no formato proprietário PS2. A solução foi implementada utilizando a linguagem Python e a framework \textit{Shiny for Python}. O sistema permite a leitura de múltiplos ficheiros, a deteção automática de registos inválidos e a apresentação de indicadores de gestão (KPIs) através de dashboards dinâmicos. A arquitetura modular adotada garante a escalabilidade e a facilidade de manutenção do código.
 
-% Índice Automático
+\vspace{1cm}
+\textbf{Palavras-chave:} Python, Shiny, Análise de Dados, PS2, Visualização.
+
+% --- ÍNDICE ---
+\newpage
 \tableofcontents
 \newpage
 
-% --- O SEU CONTEÚDO COMEÇA AQUI ---
-\section{Introdução}
-O presente relatório visa documentar o desenvolvimento de uma ferramenta em Python capaz de processar ficheiros com extensão \texttt{.ps2}...
+% --- CONTEÚDO PRINCIPAL ---
 
-\section{Estrutura do Projeto}
-O projeto encontra-se organizado segundo o padrão MVC...
+\section{Introdução}
+O processamento de grandes volumes de dados financeiros requer ferramentas que garantam não apenas a integridade da informação, mas também uma visualização clara para a tomada de decisão. O presente relatório documenta o desenvolvimento de uma ferramenta capaz de interpretar ficheiros com extensão \texttt{.ps2}, validar a sua estrutura interna e apresentar os resultados num dashboard web.
+
+\subsection{Objetivos}
+Os principais objetivos deste trabalho foram:
+\begin{itemize}
+    \item Desenvolver um algoritmo de leitura (parser) robusto para ficheiros PS2.
+    \item Implementar mecanismos de validação para isolar ficheiros corrompidos.
+    \item Criar uma interface gráfica reativa para filtragem de dados por data, entidade e ficheiro.
+    \item Visualizar métricas chave, como o Top de Clientes (Pareto) e a Evolução Temporal.
+\end{itemize}
+
+\section{Arquitetura da Solução}
+O projeto foi estruturado seguindo princípios de modularidade, separando a lógica de processamento de dados da interface do utilizador.
+
+\subsection{Estrutura de Ficheiros}
+A organização do projeto segue a seguinte hierarquia:
+\begin{itemize}
+    \item \texttt{app.py}: Ponto de entrada da aplicação Shiny (Front-end e Lógica de Servidor).
+    \item \texttt{src/}: Módulo contendo a lógica de negócio.
+    \begin{itemize}
+        \item \texttt{ler\_ficheiros\_ps2.py}: Responsável pela leitura crua dos dados.
+        \item \texttt{validar\_dados.py}: Algoritmo de deteção de erros estruturais.
+        \item \texttt{converterParaPandas.py}: Transformação e limpeza de dados.
+    \end{itemize}
+    \item \texttt{data/}: Diretório de armazenamento dos ficheiros \texttt{.ps2}.
+    \item \texttt{docs/}: Documentação técnica gerada automaticamente pelo \texttt{pdoc}.
+\end{itemize}
+
+\section{Implementação Técnica}
+
+\subsection{Tratamento e Limpeza de Dados}
+A leitura dos dados utiliza dicionários para armazenar a informação de cabeçalhos, movimentos e rodapés. Um aspeto crítico foi a otimização da filtragem de ficheiros inválidos antes da conversão para \texttt{Pandas}, utilizando \textit{List Comprehensions} para eficiência:
+
+\begin{lstlisting}[caption={Filtragem de dados inválidos no arranque}]
+# Criar uma lista contendo APENAS os ficheiros válidos
+dados_validos = [
+    dado for dado in dados_brutos
+    if dado.get("Origem") not in ficheiros_invalidos
+]
+\end{lstlisting}
+
+\subsection{Interface e Reatividade (Shiny)}
+A interface foi construída com \texttt{Shiny for Python}, utilizando um layout de barra lateral (\textit{sidebar}) para filtros globais.
+Destaca-se a implementação de um sistema de notificações avançado que comunica entre Python e JavaScript para animar o botão de alertas quando erros são detetados.
+
+\begin{lstlisting}[caption={Comunicação Assíncrona Python-JavaScript}]
+@reactive.effect
+async def controlar_animacao_botao():
+    erros = store_invalidos()
+    tem_erro = True if erros else False
+    
+    # Envia sinal ao JS para ativar classe CSS
+    await session.send_custom_message(
+        "gerir_animacao_sino", 
+        {"id": "btn_notificacoes", "ativar": tem_erro}
+    )
+\end{lstlisting}
+
+\section{Visualização e Resultados}
+A aplicação gera cinco tipos de visualizações interativas que respondem aos filtros de data e entidade.
+
+\subsection{Análise de Pareto (Top Clientes)}
+Foi implementado um gráfico combinado (Barras e Linha) para demonstrar a regra 80/20, permitindo identificar os clientes que representam a maior fatia da faturação.
+
+% EXEMPLO DE COMO COLOCAR UMA IMAGEM
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{grafico_pareto.png}
+%     \caption{Gráfico de Pareto gerado pela aplicação.}
+%     \label{fig:pareto}
+% \end{figure}
+
+\subsection{Deteção de Erros}
+O sistema é capaz de identificar ficheiros que não cumprem o formato esperado. Ao clicar no botão de notificações, o utilizador recebe uma lista detalhada dos ficheiros rejeitados, garantindo que os gráficos não apresentam dados enviesados.
+
+\section{Conclusão}
+O projeto resultou numa ferramenta funcional e robusta. A utilização de Python permitiu um processamento rápido dos ficheiros de texto, enquanto o Shiny ofereceu uma interface moderna sem a necessidade de tecnologias web complexas (HTML/CSS) manuais.
+Como trabalho futuro, sugere-se a integração com uma base de dados SQL para persistência histórica dos dados processados.
+
+\section*{Referências}
+\begin{enumerate}
+    \item McKinney, W. (2010). Data Structures for Statistical Computing in Python. \textit{Proceedings of the 9th Python in Science Conference}.
+    \item Shiny for Python. (2024). Documentation. Disponível em: https://shiny.posit.co/py/
+    \item Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. \textit{Computing in Science \& Engineering}.
+\end{enumerate}
 
 \end{document}
