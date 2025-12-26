@@ -28,6 +28,9 @@ Como executar o Shiny:
 2 - No browser, aceder ao seguinte endereço: http://127.0.0.1:8000/
 
 Como gerar o relatório LaTex:
+1 - Através do VSCode, instalar a extensão LaTex Workshop.
+2 - Executar o ficheiro ref/main.tex. Este ficheiro contém todos os dados que serão apresentados no pdf que será gerado.
+3 - Após a execução, irá ser gerado um ficheiro main.pdf na pasta ref.
 
 Como gerar ficheiros PDF pdoc:
 1 - Dentro da pasta do projeto, executar o seguinte comando: pdoc --html app.py src --output-dir docs --force
