@@ -91,9 +91,14 @@ Feito um estudo da biblioteca Shiny para implementação no trabalho prático, c
 
 ## Semana 6 - [22.dez a 29.dez] 
 
+- [x] Desenvolvimento da dashboard em Shiny
+- [x] Criação de ficheiros válidos
+- [x] Construção do relatório e atualização do ficheiro planeamento
+
 | #      | Branch  | Descrição da Tarefa |
 | -----  | -----   | ---- |
-| _A1_   | -----   | ---- |
-| _A2_   | -----   | ---- |
+| _A1_   | feature/validacao-ps2 | Criação de ficheiros válidos, documentação de código, variável tipo lista para apresentar ficheiros inválidos,  desenvolvimento do relatório |
+| _A2_   | feature/shiny  | Desenvolvimento da dashboard em Shiny para consultar os dados, documentação de código, desenvolvimento do relatório |
 
 ### observações / decisões  
+Os ficheiros inválidos devem aparecem listados pelo nome do ficheiro, não sendo carregados para a dashboard.
