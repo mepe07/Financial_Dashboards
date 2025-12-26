@@ -1,3 +1,7 @@
+"""
+Módulo onde são agrupados os dados lidos em listas de dicionários
+"""
+
 import pandas as pd
 from typing import List, Dict, Any
 

@@ -30,3 +30,5 @@ Como executar o Shiny:
 Como gerar o relatório LaTex:
 
 Como gerar ficheiros PDF pdoc:
+1 - Dentro da pasta do projeto, executar o seguinte comando: pdoc --html app.py src --output-dir docs --force
+2 - Na pasta docs, será criado um ficheiro app.html que documenta todo o código que gere o funcionamento do shiny (frontend), e uma pasta src onde existe documentação específica para cada um dos módulos de tratamento dos dados, bem como um ficheiro index.html que compila todas as informações, sendo possível visualizar todos os dados dentro deste ficheiro através da navegação por links.
