@@ -167,6 +167,15 @@ app_ui = ui.page_sidebar(
                         animation: ding 1.2s ease-in-out infinite; /* Balança para sempre */
                         color: #ffc107; /* Muda a cor do sino para amarelo/laranja */
                     }
+                              
+                    .modal {
+                        display: flex !important;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .modal-dialog {
+                        margin: 0 auto;
+                    }
                 """),
 
 
@@ -351,7 +360,6 @@ app_ui = ui.page_sidebar(
 )
 
 
-
 #-----------------------------------------------------------
 #                 3. SERVIDOR (Lógica)
 #-----------------------------------------------------------
@@ -368,7 +376,6 @@ def server(input, output, session):
     store_invalidos = reactive.Value(ficheiros_invalidos)
 
 
-    # Função que carrega os dados do disco (ao iniciar e ao clicar no botão)
     # Função que carrega os dados do disco (ao iniciar e ao clicar no botão)
     @reactive.effect
     @reactive.event(input.btn_atualizar, ignore_init=True)
@@ -388,12 +395,12 @@ def server(input, output, session):
 
             # Nova validação, pois podem ter entrado ficheiros invalidos
             lista_erros = validar_dados(novos_dados_brutos)
-            store_invalidos.set(lista_erros) # guardar na memória reativa
+            
+            # --- ALTERAÇÃO 1: Atualizamos apenas a store. ---
+            # Removemos a notificação daqui para não duplicar. 
+            # A função 'controlar_animacao_botao' vai detetar a mudança e avisar.
+            store_invalidos.set(lista_erros) 
 
-            # Se houver erros, avisar imeatamente
-            if lista_erros:
-                msg = f"Atenção: Foram detetados {len(lista_erros)} ficheiros inválidos!"
-                ui.notification_show(msg, type="warning", duration=5)
             
             # FILTRAGEM - Lista apenas com os ficheiros que passaram na validação
             dados_validos = [
@@ -468,20 +475,17 @@ def server(input, output, session):
                     footer=ui.modal_button("Fechar")
                 )
             )
-        # else:
-        #     # CASO B: Não existem erros -> Notificação Verde
-        #     ui.notification_show("Tudo operacional! Não existem ficheiros inválidos.", type="message", duration=3)
 
 
-
-    # NOVO: Controlar a animação sem redesenhar o botão
-    # NOTA: Adicionámos 'async' antes do def
+    # NOVO: Controlar a animação E AS NOTIFICAÇÕES GERAIS
     @reactive.effect
     async def controlar_animacao_botao():
         """
         Efeito assíncrono que monitoriza a lista de ficheiros inválidos.
-        Envia uma mensagem personalizada (JavaScript) para ativar ou desativar
-        a classe CSS de animação do botão de notificações.
+        Corre automaticamente no ARRANQUE e sempre que a lista muda.
+        
+        1. Ativa/Desativa animação do sino via JS.
+        2. Mostra notificação 'toast' se houver erros.
         """
         # Lemos a lista de erros
         erros = store_invalidos()
@@ -489,15 +493,17 @@ def server(input, output, session):
         # Calculamos se deve ter animação
         tem_erro = True if erros else False
         
-        
-        # O print ajuda a confirmar no terminal se a função está a correr
-        # print(f"DEBUG: Atualizar botão. Tem erros? {tem_erro}") 
-        
-        # NOTA: Adicionámos 'await' aqui. É isto que faz a mensagem sair!
+        # 1. Envia sinal ao JavaScript para animar o botão
         await session.send_custom_message(
             "gerir_animacao_sino", 
             {"id": "btn_notificacoes", "ativar": tem_erro}
         )
+
+        # 2. --- ALTERAÇÃO 2: Notificação automática ---
+        # Como este efeito corre no arranque, a mensagem vai aparecer logo se houver erros iniciais.
+        if tem_erro:
+            msg = f"Atenção: Foram detetados {len(erros)} ficheiros inválidos! Aceda às notificações para saber mais."
+            ui.notification_show(msg, type="warning", duration=8) # 8 segundos para garantir leitura
 
 
     # --- 2. CÁLCULOS E FILTROS ---
@@ -508,6 +514,7 @@ def server(input, output, session):
         (Data, Entidade, Ficheiro) aos dados globais e retorna um dicionário
         com os DataFrames filtrados.
         """
+        # ... (RESTO DO CÓDIGO MANTÉM-SE IGUAL) ...
         # Ler do nosso container reativo
         pacote = store_dados()
         
@@ -558,21 +565,75 @@ def server(input, output, session):
     def tabela_cabecalho():
         """Renderiza a tabela de cabeçalhos (Tipo 1)."""
         df = dados_filtrados()["cab"].copy()
-        if not df.empty and "Data" in df.columns:
-            # Converter para datetime só para garantir, caso venha string
-            df["Data"] = pd.to_datetime(df["Data"]) 
-            df["Data"] = df["Data"].dt.strftime('%d/%m/%Y')
-        return render.DataGrid(df, filters=True)
+        
+        if not df.empty:
+            # 1. Tratamento da Data
+            if "Data" in df.columns:
+                df["Data"] = pd.to_datetime(df["Data"]).dt.strftime('%d/%m/%Y')
+            
+            # 2. Tratamento da Quantidade (Inteiro)
+            col_qtd = "Qtd Transações"
+            if col_qtd in df.columns:
+                df[col_qtd] = pd.to_numeric(df[col_qtd], errors='coerce').fillna(0).astype(int)
+
+            # 3. Tratamento do Valor Total (NUMÉRICO para permitir filtros)
+            col_valor = "Valor total"
+            if col_valor in df.columns:
+                # Convertemos para float (número com casas decimais)
+                df[col_valor] = pd.to_numeric(df[col_valor], errors='coerce').fillna(0).round(2)
+                
+                # Opcional: Renomear a coluna para indicar a moeda no cabeçalho
+                df = df.rename(columns={col_valor: "Valor Total (€)"})
+
+        return render.DataGrid(df, filters=True, width="100%")
+    
+
 
     @render.data_frame
     def tabela_movimentos():
         """Renderiza a tabela de movimentos (Tipo 2)."""
-        return render.DataGrid(dados_filtrados()["mov"], filters=True)
+        # 1. Criar cópia explícita para evitar avisos
+        df = dados_filtrados()["mov"].copy()
+        
+        # 2. Remover Zeros à Esquerda
+        colunas_alvo = ["Tipo operação", "Nº operação"]
+        
+        for col in colunas_alvo:
+            if col in df.columns:
+                # Converte para texto -> Corta zeros à esquerda -> Se ficar vazio (era "000"), põe "0"
+                df[col] = df[col].astype(str).str.lstrip("0").replace("", "0")
+
+        # 3. Renomear a coluna Valor para incluir o símbolo €
+        if "Valor" in df.columns:
+            df = df.rename(columns={"Valor": "Valor (€)"})
+
+        return render.DataGrid(df, filters=True, width="100%")
+    
+
 
     @render.data_frame
     def tabela_rodape():
         """Renderiza a tabela de rodapés/totais (Tipo 9)."""
-        return render.DataGrid(dados_filtrados()["rod"], filters=True)
+        df = dados_filtrados()["rod"].copy()
+        
+        if not df.empty:
+            # 1. Tratamento da Quantidade (Remove zeros à esquerda)
+            # Confirme se o nome da coluna no Rodapé é exatamente este.
+            # Se for "Qtd Registos" ou "Quantidade", altere o texto abaixo.
+            col_qtd = "Qtd Transações" 
+            
+            if col_qtd in df.columns:
+                df[col_qtd] = pd.to_numeric(df[col_qtd], errors='coerce').fillna(0).astype(int)
+
+            # 2. Tratamento do Valor Total (Adiciona € no título e mantém numérico)
+            col_valor = "Valor total"
+            if col_valor in df.columns:
+                df[col_valor] = pd.to_numeric(df[col_valor], errors='coerce').fillna(0).round(2)
+                df = df.rename(columns={col_valor: "Valor Total (€)"})
+
+        return render.DataGrid(df, filters=True, width="100%")
+    
+
     
     @render.text
     def texto_total_registos():
@@ -663,7 +724,7 @@ def server(input, output, session):
 
     @render.plot
     def grafico_linha_tempo():
-        """Gráfico de Linhas Múltiplas: Uma linha por Entidade (Top 5)"""
+        """Gráfico de Linhas Múltiplas: Uma linha por Entidade (Top 10)"""
         df = dados_filtrados()["cab"]
         
         # 1. Verificação de segurança
@@ -673,24 +734,27 @@ def server(input, output, session):
             return fig
 
         # 2. PREPARAÇÃO DOS DADOS
-        # Nota: Mantemos o filtro Top 5 na lógica de dados para garantir que o gráfico 
-        # não fica ilegível se selecionar um ficheiro com 50 entidades, por exemplo.
-        top_entidades = df.groupby("Entidade")["Valor total"].sum().nlargest(5).index.tolist()
+        # ALTERAÇÃO AQUI: Mudámos de 5 para 10
+        top_entidades = df.groupby("Entidade")["Valor total"].sum().nlargest(10).index.tolist()
         df_top = df[df["Entidade"].isin(top_entidades)]
         
         # Agrupar por Data (Mês) e Entidade
+        # Mantive o freq='ME' conforme o seu input. Se estiver no Linux antigo, mude para 'M'.
         df_pivot = df_top.set_index("Data").groupby([pd.Grouper(freq='ME'), 'Entidade'])["Valor total"].sum().unstack(fill_value=0)
 
         # 3. Criar a figura
         fig, ax = plt.subplots(figsize=(12, 6))
         
         # 4. Desenhar as Linhas
+        # O 'tab10' tem exatamente 10 cores, por isso funciona perfeitamente para o Top 10.
         cmap = plt.get_cmap('tab10')
         
         for i, entidade in enumerate(df_pivot.columns):
+            # O módulo (%) garante que se houver mais de 10 por erro, as cores repetem-se sem falhar
+            cor = cmap(i % 10) 
             ax.plot(df_pivot.index, df_pivot[entidade], 
                     marker='o', linestyle='-', linewidth=2, 
-                    label=entidade, color=cmap(i)) 
+                    label=entidade, color=cor) 
 
         # 5. Formatar Datas em Português
         def formatar_data_pt(x, pos):
@@ -710,10 +774,9 @@ def server(input, output, session):
         entidade_selecionada = input.filtro_entidade()
         ficheiro_selecionado = input.filtro_ficheiro()
 
-        # Se não houver filtros, especificamos que é o Top 5.
-        # Se houver filtros, usamos um título genérico.
+        # Se não houver filtros, especificamos que é o Top 10.
         if entidade_selecionada == "Todas" and ficheiro_selecionado == "Todos":
-            titulo_base = "Evolução Mensal (Top 5 Entidades)"
+            titulo_base = "Evolução Mensal (Top 10 Entidades)" # ALTERAÇÃO AQUI NO TEXTO
         else:
             titulo_base = "Evolução Mensal das Cobranças"
 
@@ -734,6 +797,7 @@ def server(input, output, session):
         ax.set_ylabel("Valor Cobrado (€)")
         ax.grid(True, linestyle='--', alpha=0.5)
         
+        # Ajuste da legenda para caberem 10 itens sem tapar o gráfico
         ax.legend(title="Entidade", bbox_to_anchor=(1.02, 1), loc='upper left')
         
         plt.xticks(rotation=45)
@@ -964,7 +1028,6 @@ def server(input, output, session):
                 "g_pareto": "Pareto"
             }
             
-            # --- O TRUQUE ESTÁ AQUI ---
             # Se a opção global não estiver selecionada, adicionamo-la manualmente
             if "g_linhas_global" not in selecao_atual:
                 selecao_atual.append("g_linhas_global")
@@ -992,353 +1055,15 @@ def server(input, output, session):
 
 
 
-
-app = App(app_ui, server)
-
-
-
-
-
-
-
-
-
-
-# from shiny import App, render, ui, reactive
-# import pandas as pd
-# from datetime import date
-# from src import ler_ficheiros_ps2
-# from src import converterParaPandas
-# from src import validar_dados
-# import matplotlib.pyplot as plt
-# import matplotlib.dates as mdates
-# import numpy as np
-# from faicons import icon_svg
-# from matplotlib.ticker import PercentFormatter # Para o eixo da % do grafico de pareto
-
-# # --- 1. CARREGAMENTO DE DADOS ---
-# dados_brutos = ler_ficheiros_ps2()
-# ficheiros_invalidos = validar_dados(dados_brutos)
-
-# dados_validos = [
-#     dado for dado in dados_brutos
-#     if dado.get("Origem") not in ficheiros_invalidos
-# ]
-
-# pacote = converterParaPandas(dados_validos)
-
-# df_cabecalho_global = pacote["cabecalho"]
-# df_movimentos_global = pacote["movimentos"]
-# df_rodape_global = pacote["rodape"]
-
-# # Garantir que a Data é datetime logo no início para evitar erros depois
-# if "Data" in df_cabecalho_global.columns:
-#     df_cabecalho_global["Data"] = pd.to_datetime(df_cabecalho_global["Data"])
-
-# # --- PREPARAÇÃO DOS FILTROS ---
-# data_min = date.today()
-# data_max = date.today()
-
-# if not df_cabecalho_global.empty and "Data" in df_cabecalho_global.columns:
-#     dates = df_cabecalho_global["Data"].dt.date
-#     data_min = dates.min()
-#     data_max = dates.max()
-
-# if "Origem" in df_cabecalho_global.columns:
-#     lista_ficheiros = sorted(df_cabecalho_global["Origem"].unique().tolist())
-# else:
-#     lista_ficheiros = []
-# opcoes_ficheiros = ["Todos"] + lista_ficheiros
-
-# if "Entidade" in df_cabecalho_global.columns:
-#     lista_entidades = sorted(df_cabecalho_global["Entidade"].unique().tolist())
-# else:
-#     lista_entidades = []
-# opcoes_entidades = ["Todas"] + lista_entidades
-
-
-# # --- 2. INTERFACE (UI) ---
-
-# # Barra lateral
-# app_ui = ui.page_sidebar(
-#     ui.sidebar(
-#         ui.h3("Filtros"),
-
-#         # Botão de Atualizar
-#         # ui.input_action_button("btn_atualizar", "Atualizar Dados", icon=icon_svg("arrows-rotate")),
-#         # ui.hr(),
-
-#         # 1. Interruptor (Switch)
-#         ui.input_switch("ativar_filtro_data", "Filtrar por Datas", value=True),
-
-#         # 2. O Seletor de Datas (dentro de um painel condicional)
-#         # Este painel só aparece se o input "ativar_filtro_data" for verdadeiro
-#         ui.panel_conditional(
-#             "input.ativar_filtro_data",  # Condição JavaScript (nome do input)
-#             ui.input_date_range(
-#                 "filtro_data", 
-#                 "Intervalo de Datas:",
-#                 start=data_min, 
-#                 end=data_max, 
-#                 min=data_min, 
-#                 max=data_max,
-#                 format="dd/mm/yyyy", 
-#                 language="pt-pt"
-#             )
-#         ),
-
-#         # Linha divisória
-#         # ui.hr(),
-
-#         ui.input_select(
-#             "filtro_entidade", "Entidade:", 
-#             choices=opcoes_entidades, selected="Todas"
-#         ),
-
-#         ui.input_select(
-#             "filtro_ficheiro", "Ficheiro Específico:", 
-#             choices=opcoes_ficheiros, selected="Todos",
-            
-#         ),
-        
-#         ui.hr(style="margin: 5px 0;"),
-
-#         # Checkboxes        
-#         ui.input_checkbox_group(
-#             "selecao_graficos", # ID do input
-#             "Mostrar Gráficos:", # Título
-#             # Dicionário: "id_interno": "Nome que aparece no ecrã"
-#             {
-#                 "g_barras": "Top Entidades",
-#                 "g_linhas": "Evolução Mensal",
-#                 "g_linhas_global": "Evolução Global",
-#                 "g_hist": "Histograma",
-#                 "g_pareto": "Pareto"
-#             },
-#             # Quais começam selecionados? (Todos)
-#             selected=["g_barras", "g_linhas", "g_linhas_global", "g_hist", "g_pareto"] 
-#         ),
-        
-#         ui.hr(style="margin: 5px 0;"),
-        
-#         ui.p("Resumo:"),
-#         ui.output_text("texto_total_registos")
-#     ),
-
-#     # Zona central
-#     ui.page_fluid(
-#         # FLEXBOX
-#         ui.div(
-#             ui.h2("Dashboard Financeiro", style="margin: 0"),
-
-#             # Algoritmo CSS para que o sino balance quando tem notificações
-#             ui.div(
-#                 ui.tags.style("""
-#                     /* Definir a animação 'ding' */
-#                     @keyframes ding {
-#                         0% { transform: rotate(0deg); }
-#                         20% { transform: rotate(15deg); }
-#                         40% { transform: rotate(-10deg); }
-#                         60% { transform: rotate(5deg); }
-#                         80% { transform: rotate(-5deg); }
-#                         100% { transform: rotate(0deg); }
-#                     }
-
-#                     /* Classe que ativa a animação */
-#                     .tem-notificacao svg {
-#                         animation: ding 1.2s ease-in-out infinite; /* Balança para sempre */
-#                         color: #ffc107; /* Muda a cor do sino para amarelo/laranja */
-#                     }
-#                 """),
-
-
-#                 # Botão de Atualizar
-#                 ui.input_action_button(
-#                     "btn_atualizar", 
-#                     "Atualizar Dados", 
-#                     icon=icon_svg("arrows-rotate"), 
-#                     class_="btn-primary"
-#                 ),
-
-#                 # Botão de notificações
-#                 # 1. O SCRIPT MÁGICO (Ensina o browser a ligar/desligar a animação)
-#                 ui.tags.script("""
-#                     Shiny.addCustomMessageHandler('gerir_animacao_sino', function(mensagem) {
-#                         // Procura o botão pelo ID
-#                         var botao = document.getElementById(mensagem.id);
-#                         if (botao) {
-#                             if (mensagem.ativar) {
-#                                 botao.classList.add('tem-notificacao'); // Liga animação
-#                             } else {
-#                                 botao.classList.remove('tem-notificacao'); // Desliga animação
-#                             }
-#                         }
-#                     });
-#                 """),
-
-#                 # 2. O BOTÃO ESTÁTICO (Aparece instantaneamente!)
-#                 # Nota: Removemos o @render.ui e colocamos o botão "fixo" aqui
-#                 ui.input_action_button(
-#                     "btn_notificacoes", 
-#                     "Notificações", 
-#                     icon=icon_svg("bell"), 
-#                     class_="btn-secondary", # Começa cinzento (sem animação)
-#                     # Mantemos o estilo visual
-#                     #style="display: flex; align-items: center; justify-content: center; padding: 0;"
-#                 ),
-                
-
-#                 style="display: flex; gap: 10px;"
-
-#             ),
-
-#             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px"
-
-#         ),
-        
-        
-        
-#         ui.navset_card_underline(
-
-#             ### Aba de Gráficos ###
-#             ui.nav_panel("Análise Gráfica", 
-#                 # --- CONTAINER FLEXBOX ---
-#                 ui.div(
-                    
-#                     # Gráfico 1 (Total cobrado por entidade)
-#                     ui.panel_conditional(   
-#                         "input.selecao_graficos.includes('g_barras')",
-#                         ui.card(
-#                             ui.card_header(
-#                                 ui.div(
-#                                     "Top Entidades (Valor Total)",
-#                                     ui.tooltip(
-#                                         ui.span(
-#                                             icon_svg("circle-info"),
-#                                             style="color: #6c757d; cursor: help; margin-left: 8px; font-size: 0.9em;"
-#                                         ),
-#                                         "Análise de volume acumulado por entidade. Essencial para identificar contas estratégicas e compreender a concentração da carteira de cobranças (quem representa a maior fatia do valor total)",
-#                                         placement="auto"
-#                                     ),
-#                                     style="display: flex; align-items: center;"
-#                                 )
-#                             ),
-#                             ui.output_plot("grafico_barras_entidade", height="650px")
-#                         )
-#                     ),
-#                     # Gráfico 2 (Evolução mensal top 5 entidades)
-#                     ui.panel_conditional(   
-#                         "input.selecao_graficos.includes('g_linhas')",                     
-#                         ui.card(
-#                             ui.card_header(
-#                                 ui.div(
-#                                     "Evolução Temporal das Cobranças",
-#                                     ui.tooltip(
-#                                         ui.span(
-#                                             icon_svg("circle-info"),
-#                                             style="color: #6c757d; cursor: help; margin-left: 8px; font-size: 0.9em;"
-#                                         ),
-#                                         "Monitorização do fluxo de cobranças. Permite identificar dias com picos de cobrança para e analisar a regularidade das mesmas.",
-#                                         placement="auto"
-#                                     ),
-#                                     style="display: flex; align-items: center;"
-#                                 )
-#                             ),
-#                             ui.output_plot("grafico_linha_tempo", height="600px")
-#                         )
-#                     ),
-
-#                     # Gráfico 3 (Evolução das cobranças global)
-#                     ui.panel_conditional (
-#                         # Só aparecer se não houver filtro de entidade e/ou ficheiro
-#                         "input.filtro_entidade === 'Todas' && input.filtro_ficheiro === 'Todos' && input.selecao_graficos.includes('g_linhas_global')",
-#                         ui.card(
-#                             ui.card_header(
-#                                 ui.div(
-#                                     "Evolução Temporal das Cobranças (Soma global)",
-#                                     ui.tooltip(
-#                                         ui.span(
-#                                             icon_svg("circle-info"),
-#                                             style="color: #6c757d; cursor: help; margin-left: 8px; font-size: 0.9em;"
-#                                         ),
-#                                         "Monitorização global do fluxo de caixa. Permite estabelecer métricas de períodos mais comuns de cobrança.",
-#                                         placement="auto"
-#                                     ),
-#                                     style="display: flex; align-items: center;"
-#                                 )
-#                             ),
-#                             ui.output_plot("grafico_evolucao_temporal", height="600px")
-#                         )
-#                     ),
-                    
-#                     # Gráfico 4 (Frequência por faixa de valor)
-#                     ui.panel_conditional(   
-#                         "input.selecao_graficos.includes('g_hist')",
-#                         ui.card(
-#                             ui.card_header(
-#                                 ui.div(
-#                                     "Distribuição de Valores (Histograma)",
-#                                     ui.tooltip(
-#                                         ui.span(
-#                                             icon_svg("circle-info"),
-#                                             style="color: #6c757d; cursor: help; margin-left: 8px; font-size: 0.9em;"
-#                                         ),
-#                                         "Qual é o valor médio de uma cobrança? Ajuda a entender o perfil da carteira.",
-#                                         placement="auto"
-#                                     ),
-#                                     style="display: flex; align-items: center;"
-#                                 )
-#                             ),
-#                             ui.output_plot("grafico_histograma_valores", height="500px")
-#                         )
-#                     ),
-                    
-#                     # Gráfico 5 (Pareto)
-#                     ui.panel_conditional(   
-#                         "input.selecao_graficos.includes('g_pareto')",
-#                         ui.card(
-#                             ui.card_header(
-#                                 ui.div(
-#                                     "Top Clientes - Diagrama de Pareto (80/20)",
-#                                     ui.tooltip(
-#                                         ui.span(
-#                                             icon_svg("circle-info"), 
-#                                             style="color: #6c757d; cursor: help; margin-left: 8px; font-size: 0.9em;"
-#                                         ),
-#                                         "Onde a linha vermelha cruza o tracejado cinzento (80%), todos os NIFs à esquerda desse ponto representam 80% da faturação. Estes são os clientes que garantem maior rentabilidade.",
-#                                         placement="auto"
-#                                     ),
-#                                     style="display: flex; align-items: center;"
-#                                 )
-#                             ),
-#                             ui.output_plot("grafico_pareto_clientes", height="600px")
-#                         )
-#                     ),
-
-#                     # --- ESTILO DO CONTAINER ---
-#                     # display: flex + column -> Empilha um por baixo do outro
-#                     # gap: 30px -> Cria o espaço vazio entre cada cartão
-#                     style="display: flex; flex-direction: column; gap: 30px; margin-top: 20px;"
-#                 )
-#             ),
-            
-            
-#             ui.nav_panel("Cabeçalhos", ui.output_data_frame("tabela_cabecalho")),
-
-#             ui.nav_panel("Movimentos", ui.output_data_frame("tabela_movimentos")),
-
-#             ui.nav_panel("Rodapés", ui.output_data_frame("tabela_rodape")),
-#         )
-#     )
-# )
-
-
-
 # #-----------------------------------------------------------
 # #                 3. SERVIDOR (Lógica)
 # #-----------------------------------------------------------
 
 # def server(input, output, session):
+#     """
+#     Função principal do servidor Shiny. Contém toda a lógica de negócio,
+#     reatividade, filtragem e geração de gráficos.
+#     """
 
 #     # --- 1. GESTÃO DE DADOS ---
 #     # Container reativo para guardar os dados carregados e também invalidos
@@ -1351,6 +1076,11 @@ app = App(app_ui, server)
 #     @reactive.effect
 #     @reactive.event(input.btn_atualizar, ignore_init=True)
 #     def carregar_dados_do_disco():
+#         """
+#         Reage ao botão 'Atualizar Dados'. 
+#         Lê novamente a pasta 'data', valida os ficheiros, filtra os inválidos,
+#         atualiza os dados reativos (stores) e atualiza os dropdowns da UI.
+#         """
 #         # Guardamos o ID da notificação numa variável
 #         id_notificacao = ui.notification_show("A ler ficheiros...", type="message", duration=None)
         
@@ -1411,6 +1141,10 @@ app = App(app_ui, server)
 #     @reactive.effect
 #     @reactive.event(input.btn_notificacoes)
 #     def mostrar_janela_erros():
+#         """
+#         Reage ao clique no botão de notificações (sino).
+#         Abre uma janela modal com a lista de ficheiros inválidos, se existirem.
+#         """
 #         # Vamos buscar a lista atual de erros
 #         erros = store_invalidos()
         
@@ -1447,6 +1181,11 @@ app = App(app_ui, server)
 #     # NOTA: Adicionámos 'async' antes do def
 #     @reactive.effect
 #     async def controlar_animacao_botao():
+#         """
+#         Efeito assíncrono que monitoriza a lista de ficheiros inválidos.
+#         Envia uma mensagem personalizada (JavaScript) para ativar ou desativar
+#         a classe CSS de animação do botão de notificações.
+#         """
 #         # Lemos a lista de erros
 #         erros = store_invalidos()
         
@@ -1467,6 +1206,11 @@ app = App(app_ui, server)
 #     # --- 2. CÁLCULOS E FILTROS ---
 #     @reactive.calc
 #     def dados_filtrados():
+#         """
+#         Cálculo reativo central. Aplica os filtros selecionados pelo utilizador
+#         (Data, Entidade, Ficheiro) aos dados globais e retorna um dicionário
+#         com os DataFrames filtrados.
+#         """
 #         # Ler do nosso container reativo
 #         pacote = store_dados()
         
@@ -1515,6 +1259,7 @@ app = App(app_ui, server)
 
 #     @render.data_frame
 #     def tabela_cabecalho():
+#         """Renderiza a tabela de cabeçalhos (Tipo 1)."""
 #         df = dados_filtrados()["cab"].copy()
 #         if not df.empty and "Data" in df.columns:
 #             # Converter para datetime só para garantir, caso venha string
@@ -1524,14 +1269,17 @@ app = App(app_ui, server)
 
 #     @render.data_frame
 #     def tabela_movimentos():
+#         """Renderiza a tabela de movimentos (Tipo 2)."""
 #         return render.DataGrid(dados_filtrados()["mov"], filters=True)
 
 #     @render.data_frame
 #     def tabela_rodape():
+#         """Renderiza a tabela de rodapés/totais (Tipo 9)."""
 #         return render.DataGrid(dados_filtrados()["rod"], filters=True)
     
 #     @render.text
 #     def texto_total_registos():
+#         """Renderiza o texto de resumo (nº docs e total euros) na barra lateral."""
 #         dados = dados_filtrados()
 #         num_docs = len(dados['cab'])
 #         total_euros = 0.0
@@ -1540,7 +1288,7 @@ app = App(app_ui, server)
 #         return f"{num_docs} documentos | Total: {total_euros:,.2f} €"
 
 #     # ---------------------------------------
-#     # --- LÓGICA DOS GRÁFICOS ---    
+#     # --- LÓGICA DOS GRÁFICOS ---    
 #     # ---------------------------------------
 
 #     @render.plot
@@ -1557,7 +1305,7 @@ app = App(app_ui, server)
 #         # 1. Agrupar, Somar e Ordenar
 #         soma_entidade = df.groupby("Entidade")["Valor total"].sum().sort_values(ascending=False)
         
-#         # 2. Top 15 (Mantemos a lógica visual para o gráfico não ficar gigante)
+#         # 2. Top 15
 #         if len(soma_entidade) > 15:
 #             soma_entidade = soma_entidade.head(15)
 
@@ -1895,6 +1643,11 @@ app = App(app_ui, server)
 
 #     @reactive.effect
 #     def gerir_opcoes_graficos():
+#         """
+#         Efeito que monitoriza a seleção de Entidade e Ficheiro.
+#         Se os filtros estiverem em 'Todas'/'Todos', mostra a opção de 'Evolução Global'.
+#         Se houver filtros específicos, esconde essa opção para não gerar gráficos redundantes.
+#         """
 #         # 1. Ler os filtros
 #         entidade = input.filtro_entidade()
 #         ficheiro = input.filtro_ficheiro()
@@ -1943,4 +1696,4 @@ app = App(app_ui, server)
 
 
 
-# app = App(app_ui, server)
+app = App(app_ui, server)

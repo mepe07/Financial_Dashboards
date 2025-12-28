@@ -25,6 +25,9 @@ env/
 *.fls
 *.fdb_latexmk
 *.synctex.gz
+*.lof
+*.lol
+*.lot
 # Remover mais tarde se quiser enviar o pdf para o Git
-*.pdf
+#*.pdf
 #ref/*.png
