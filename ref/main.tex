@@ -65,7 +65,7 @@
     {\scshape\Large Escola Superior de Tecnologia \par}
     \vspace{1cm}
     
-    % \includegraphics[width=0.4\textwidth]{logo.png} % Descomenta se tiveres logo
+    \includegraphics[width=0.4\textwidth]{logo.png}
     \vspace{1.5cm}
     
     {\large \textbf{Licenciatura em Engenharia de Sistemas Informáticos} \par}
@@ -103,11 +103,11 @@
 \newpage
 \tableofcontents      % Índice Geral
 \newpage
-\listoffigures        % Índice de Figuras (Requisito)
+\listoffigures        % Índice de Figuras 
 \newpage
-\listoftables         % Índice de Tabelas (Requisito)
+\listoftables         % Índice de Tabelas 
 \newpage
-\lstlistoflistings    % Índice de Códigos (Requisito)
+\lstlistoflistings    % Índice de Códigos 
 \newpage
 
 % ====================================================================
@@ -115,13 +115,31 @@
 % ====================================================================
 
 \section{Introdução}
-O processamento de dados financeiros exige ferramentas robustas. Este relatório documenta uma solução em Python para leitura e análise de ficheiros PS2. O projeto utiliza a biblioteca \textit{Shiny} \cite{shiny2024} para a interface gráfica e \textit{Pandas} \cite{mckinney2012} para a manipulação de dados.
+
+No ecossistema bancário e empresarial português, a troca eficiente de informação financeira é fundamental para a gestão de tesouraria. Neste contexto, o formato PS2 (Protocolo de Serviço) assume um papel preponderante, sendo o padrão utilizado pela SIBS para a normalização de ficheiros de cobranças por Débito Direto (SEPA).
+
+Estes ficheiros caracterizam-se pela sua estrutura posicional rígida (ficheiros de texto de largura fixa), onde cada linha representa um registo específico — cabeçalhos, movimentos ou rodapés — e cada posição contém dados vitais como NIFs, montantes, entre outros. Devido a esta natureza técnica e pouco legível para o utilizador comum, a validação e análise manual destes documentos torna-se ineficiente e propensa a erros humanos.
+
+\subsection{O Desafio Proposto}
+O desafio proposto no âmbito da Unidade Curricular de Laboratórios de Informática consistiu no desenvolvimento de uma solução de software robusta capaz de facilitar a visualização da informação, recorrendo a dashboards e outras ferramentas que possam ser úteis. O sistema deveria ser capaz de:
+\begin{enumerate}
+    \item \textbf{Ingerir} ficheiros de texto em bruto, interpretando a lógica posicional do formato PS2;
+    \item \textbf{Validar} a integridade dos dados (verificação de totais de controlo e estrutura dos registos);
+    \item \textbf{Visualizar} a informação transformada através de métricas e gráficos intuitivos.
+\end{enumerate}
+
+\subsection{Solução Orquestrada}
+Para responder a estes requisitos, foi orquestrada uma solução modular desenvolvida na linguagem Python. A arquitetura do projeto baseia-se na biblioteca \textit{Pandas} \cite{mckinney2012} para a manipulação vetorial e eficiente de grandes volumes de dados, garantindo performance no processamento dos registos.
+
+Para a interface com o utilizador, optou-se pela framework \textit{Shiny for Python} \cite{shiny2024}, permitindo a criação de vários \textit{dashboards} web interativos que escondem a complexidade do código, apresentando ao utilizador final apenas os indicadores de gestão e as validações de erro necessárias.
+
+
 
 \subsection{Objetivos}
 Os objetivos principais definidos para este projeto foram:
 \begin{itemize} % Uso de Itemize (Requisito)
-    \item Desenvolver um \textit{parser} de ficheiros de texto.
-    \item Criar validações automáticas de integridade.
+    \item Desenvolver um leitor de ficheiros de PS2.
+    \item Criar validações automáticas de integridade dos ficheiros e dados neles contidos.
     \item Apresentar dados em \textit{dashboards} interativos.
 \end{itemize}
 
@@ -177,13 +195,13 @@ Os módulos principais desempenham as seguintes funções:
 \begin{description} % Uso de Description (Requisito)
     \item[app.py] Ponto de entrada da aplicação Shiny. Gere o servidor e a UI.
     \item[src/] Pasta que contém toda a lógica de negócio ("Backend").
-    \item[data/] Diretoria onde o utilizador deve depositar os ficheiros brutos.
+    \item[data/] Diretoria onde são depositados os ficheiros PS2.
 \end{description}
 
 \section{Desenvolvimento e Implementação}
 
 \subsection{Estrutura de Dados}
-Os ficheiros PS2 possuem três tipos de registo distintos. A Tabela \ref{tab:registos} detalha a estrutura esperada.
+Os ficheiros PS2 possuem três tipos de registo distintos. A Tabela \ref{tab:registos} detalha a estrutura esperada, citando o conteúdo mais relevante presente em cada tipo de entrada.
 
 % TABELA (REQUISITO)
 \begin{table}[H]
@@ -214,24 +232,77 @@ dados_validos = [
 \end{lstlisting}
 
 \section{Resultados}
-A aplicação gera visualizações gráficas utilizando a biblioteca \textit{Matplotlib} \cite{hunter2007}.
+A aplicação gera visualizações gráficas utilizando a biblioteca \textit{Matplotlib} \cite{hunter2007}, sendo que apresenta também, em formato de tabela, os dados retirados dos ficheiros PS2, permitindo a utilização de filtros para facilitar a procura por algum dado em específico.
+Além de permitir filtragem dos dados por data, permite também procurar informação relativa a um cliente em específico ou até apenas num ficheiro PS2 em concreto.
+Para dar o máximo controlo ao utilizador final, é ainda permitida a desativação/ativação de gráficos conforme o pretendido.
 
 \subsection{Análise Gráfica}
-O sistema permite visualizar a regra de Pareto. A Figura \ref{fig:exemplo} (placeholder) representa o output esperado.
+A visualização de dados desempenha um papel crucial na interpretação dos grandes volumes de informação contidos nos ficheiros PS2. Para o efeito, foram implementados cinco tipos de gráficos distintos, gerados dinamicamente com base nos dados carregados:
 
-% FIGURA (REQUISITO)
+\begin{enumerate}
+    \item \textbf{Top Entidades:} Um gráfico de barras que destaca as entidades com maior volume de transações, permitindo identificar rapidamente os principais intervenientes.
+    \item \textbf{Evolução Mensal:} Um gráfico de linhas que ilustra o comportamento dos montantes ao longo dos meses, facilitando a deteção de sazonalidade.
+    \item \textbf{Evolução Global:} Uma visualização acumulada que permite compreender a tendência geral de crescimento ou decréscimo do volume financeiro processado.
+    \item \textbf{Histograma:} Gráfico de distribuição de frequências que ajuda a compreender a dispersão dos valores das transações (e.g., predominância de pequenos movimentos vs. grandes montantes).
+    \item \textbf{Diagrama de Pareto:} Uma análise combinada (barras e linha) que aplica a regra 80/20, demonstrando quais os clientes a quem as entidades mais cobram, permitindo perceber quais são os seus melhores clientes.
+\end{enumerate}
+
+Nas figuras seguintes, apresentamos os resultados obtidos na aplicação desenvolvida.
+
+% --- INSERÇÃO DAS IMAGENS ---
+
+% Gráfico 1: Top Entidades
 \begin{figure}[H]
     \centering
-    % Substituir 'example-image' pelo print do teu gráfico
-    \includegraphics[width=0.8\textwidth]{example-image}
-    \caption{Exemplo do Dashboard Financeiro gerado.}
-    \label{fig:exemplo}
+    % Substitui 'print_top_entidades.png' pelo nome do teu ficheiro
+    \includegraphics[width=0.85\textwidth]{top_entidades.png} 
+    \caption{Visualização das Top Entidades por volume de faturação.}
+    \label{fig:top_entidades}
 \end{figure}
 
-\section{Conclusão}
-O projeto cumpriu todos os requisitos propostos. A utilização de \LaTeX\ permitiu a estruturação profissional deste relatório, integrando código, tabelas e grafos de forma coesa. A ferramenta desenvolvida é capaz de processar ficheiros PS2 e identificar erros automaticamente.
+% Gráfico 2: Evolução Mensal
+\begin{figure}[H]
+    \centering
+    % Substitui 'print_ev_mensal.png' pelo nome do teu ficheiro
+    \includegraphics[width=0.85\textwidth]{evolucao_mensal.png}
+    \caption{Gráfico de linha demonstrando a Evolução Mensal dos montantes.}
+    \label{fig:ev_mensal}
+\end{figure}
 
-% BIBLIOGRAFIA (REQUISITO)
+% Gráfico 3: Evolução Global
+\begin{figure}[H]
+    \centering
+    % Substitui 'print_ev_global.png' pelo nome do teu ficheiro
+    \includegraphics[width=0.85\textwidth]{evolucao_global.png}
+    \caption{Representação da Evolução Global acumulada dos ficheiros processados.}
+    \label{fig:ev_global}
+\end{figure}
+
+% Gráfico 4: Histograma
+\begin{figure}[H]
+    \centering
+    % Substitui 'print_histograma.png' pelo nome do teu ficheiro
+    \includegraphics[width=0.85\textwidth]{histograma.png}
+    \caption{Histograma da distribuição de valores das transações.}
+    \label{fig:histograma}
+\end{figure}
+
+% Gráfico 5: Pareto
+\begin{figure}[H]
+    \centering
+    % Substitui 'print_pareto.png' pelo nome do teu ficheiro
+    \includegraphics[width=0.85\textwidth]{pareto.png}
+    \caption{Análise de Pareto aplicada às entidades processadas.}
+    \label{fig:pareto}
+\end{figure}
+
+
+\section{Conclusão}
+O desenvolvimento deste projeto constituiu um desafio técnico enriquecedor, permitindo a aplicação prática de conceitos de Engenharia de Software num contexto financeiro real. A principal dificuldade enfrentada residiu na implementação de um \textit{leitor} robusto para o formato posicional PS2, onde a gestão rigorosa de índices e a validação de inconsistências nos dados brutos se revelaram críticas.
+
+Contudo, a superação destes obstáculos permitiu aprofundar significativamente o domínio sobre as bibliotecas \textit{Pandas} e \textit{Shiny}, consolidando a importância de uma arquitetura modular e escalável. Em suma, a solução final não só cumpre integralmente os requisitos de automação e visualização propostos, como também demonstra a eficácia de ferramentas \textit{open-source} na modernização de processos de análise de dados bancários, eliminando o erro humano associado ao tratamento manual.
+
+% BIBLIOGRAFIA
 \newpage
 % Estilo de bibliografia (pode ser plain, abnt, etc.)
 \bibliographystyle{plain} 
