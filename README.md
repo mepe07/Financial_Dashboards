@@ -30,7 +30,7 @@ Licenciatura em Engenharia de Sistemas Informáticos (*regime pós-laboral*) 202
 2. No browser, aceder ao seguinte endereço: http://127.0.0.1:8000/
 
 
-Como gerar o relatório LaTeX:
+**Como gerar o relatório LaTeX:**
 
 1. Através do VSCode, instalar a extensão LaTeX Workshop.
 
@@ -39,11 +39,16 @@ Como gerar o relatório LaTeX:
 3. Após a execução, irá ser gerado um ficheiro `main.pdf` na pasta ref.
 
 
-Como gerar o relatório LaTex:
-1 - Através do VSCode, instalar a extensão LaTex Workshop.
-2 - Executar o ficheiro ref/main.tex. Este ficheiro contém todos os dados que serão apresentados no pdf que será gerado.
-3 - Após a execução, irá ser gerado um ficheiro main.pdf na pasta ref.
+**Como gerar ficheiros HTML pdoc:**
 
-Como gerar ficheiros HTML pdoc:
-1 - Dentro da pasta do projeto, executar o seguinte comando: pdoc --html app.py src --output-dir docs --force
-2 - Na pasta docs, será criado um ficheiro app.html que documenta todo o código que gere o funcionamento do shiny (frontend), e uma pasta src onde existe documentação específica para cada um dos módulos de tratamento dos dados, bem como um ficheiro index.html que compila todas as informações, sendo possível visualizar todos os dados dentro deste ficheiro através da navegação por links.
+1. Dentro da pasta do projeto, executar o seguinte comando:
+    ```bash
+    pdoc --html app.py src --output-dir docs --force
+
+2. Na pasta docs, será criado:
+
+Um ficheiro `app.html` que documenta todo o código que gere o funcionamento do shiny (frontend).
+
+Uma pasta `src` onde existe documentação específica para cada um dos módulos de tratamento dos dados.
+
+Um ficheiro `index.html` que compila todas as informações, sendo possível visualizar todos os dados dentro deste ficheiro através da navegação por links.
