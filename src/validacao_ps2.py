@@ -215,6 +215,7 @@ def validar_dados(lista_dados_geral: list) -> list:
                 
                 # Valida se o total declarado bate certo com a soma real
                 if valor_total_header is not None and valor_total_header != soma_real_valor:
+                    #print(f"ERRO valor total {valor_total_header}, {soma_real_valor}, {lista_dados[i]}")
                     ficheiro_atual_valido = False
 
             # >>>> TIPO 2 (Transações)
