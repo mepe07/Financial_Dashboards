@@ -23,8 +23,6 @@ Licenciatura em Engenharia de Sistemas Informáticos (*regime pós-laboral*) 202
 
 ### executar a aplicação 
 
-### Executar a aplicação
-
 **Como executar o Shiny:**
 1. Dentro da pasta do projeto, executar o comando:
    ```bash
@@ -32,12 +30,14 @@ Licenciatura em Engenharia de Sistemas Informáticos (*regime pós-laboral*) 202
 2. No browser, aceder ao seguinte endereço: http://127.0.0.1:8000/
 
 
+Como gerar o relatório LaTeX:
 
+1. Através do VSCode, instalar a extensão LaTeX Workshop.
 
+2. Executar o ficheiro `main.tex` que se encontra dentro da pasta ref. Este ficheiro contém todos os dados que serão apresentados no PDF que será gerado.
 
-Como executar o Shiny:
-1 - Dentro da pasta do projeto, executar o comando "shiny run --reload app.py"
-2 - No browser, aceder ao seguinte endereço: http://127.0.0.1:8000/
+3. Após a execução, irá ser gerado um ficheiro `main.pdf` na pasta ref.
+
 
 Como gerar o relatório LaTex:
 1 - Através do VSCode, instalar a extensão LaTex Workshop.
