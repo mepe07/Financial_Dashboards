@@ -20,8 +20,10 @@ Licenciatura em Engenharia de Sistemas Informáticos (*regime pós-laboral*) 202
 |[doc/](./doc/)  | relatório em LaTex|
 |[ref/](./ref/)  | documentação do código (pdoc)| 
 |[src/](./src/)  | código com a implementação da solução desenvolvida |
+|[app.py](.app.py)  | algoritmo do Shiny (frontend) |
 
-### executar a aplicação 
+---
+### Executar a aplicação 
 
 **Como executar o Shiny:**
 1. Dentro da pasta do projeto, executar o comando:
@@ -29,7 +31,7 @@ Licenciatura em Engenharia de Sistemas Informáticos (*regime pós-laboral*) 202
    shiny run --reload app.py
 2. No browser, aceder ao seguinte endereço: http://127.0.0.1:8000/
 
-
+---
 **Como gerar o relatório LaTeX:**
 
 1. Através do VSCode, instalar a extensão LaTeX Workshop.
@@ -38,7 +40,7 @@ Licenciatura em Engenharia de Sistemas Informáticos (*regime pós-laboral*) 202
 
 3. Após a execução, irá ser gerado um ficheiro `main.pdf` na pasta ref.
 
-
+---
 **Como gerar ficheiros HTML pdoc:**
 
 1. Dentro da pasta do projeto, executar o seguinte comando:
