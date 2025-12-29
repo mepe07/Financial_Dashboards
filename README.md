@@ -23,6 +23,18 @@ Licenciatura em Engenharia de Sistemas Informáticos (*regime pós-laboral*) 202
 
 ### executar a aplicação 
 
+### Executar a aplicação
+
+**Como executar o Shiny:**
+1. Dentro da pasta do projeto, executar o comando:
+   ```bash
+   shiny run --reload app.py
+2. No browser, aceder ao seguinte endereço: http://127.0.0.1:8000/
+
+
+
+
+
 Como executar o Shiny:
 1 - Dentro da pasta do projeto, executar o comando "shiny run --reload app.py"
 2 - No browser, aceder ao seguinte endereço: http://127.0.0.1:8000/
@@ -32,6 +44,6 @@ Como gerar o relatório LaTex:
 2 - Executar o ficheiro ref/main.tex. Este ficheiro contém todos os dados que serão apresentados no pdf que será gerado.
 3 - Após a execução, irá ser gerado um ficheiro main.pdf na pasta ref.
 
-Como gerar ficheiros PDF pdoc:
+Como gerar ficheiros HTML pdoc:
 1 - Dentro da pasta do projeto, executar o seguinte comando: pdoc --html app.py src --output-dir docs --force
 2 - Na pasta docs, será criado um ficheiro app.html que documenta todo o código que gere o funcionamento do shiny (frontend), e uma pasta src onde existe documentação específica para cada um dos módulos de tratamento dos dados, bem como um ficheiro index.html que compila todas as informações, sendo possível visualizar todos os dados dentro deste ficheiro através da navegação por links.
