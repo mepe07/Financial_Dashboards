@@ -152,6 +152,8 @@ def ler_ficheiros_ps2() -> list:
 
     return todos_os_registos
 
+
+
 # --- BLOCO DE TESTE RÁPIDO ---
 if __name__ == "__main__":
     # Este bloco só corre se executar este ficheiro diretamente.

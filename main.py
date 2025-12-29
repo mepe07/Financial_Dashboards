@@ -33,24 +33,6 @@ def main():
         if not df_rodape.empty:
             print(df_rodape)
 
-        # print(df_cabecalho)
-        # print()
-        # print(df_movimentos)
-        # print()
-        # print(df_rodape)
-
-
-        # print("--- Tipos de Dados (Verificação) ---")
-        # print(df_cabecalho.dtypes)
-        
-
-        #  Teste do leitura_ps2.py
-        # for registo in lista_dados:
-        #     print("NOVO REGISTO")
-        #     print("")
-        #     for chave, valor in registo.items():
-        #         print(f"{chave}: {valor}")
-        #         print("")
 
     except FileNotFoundError as e:
         print(f"Ficheiro não encontrado: {e}")
