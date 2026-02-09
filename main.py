@@ -1,6 +1,8 @@
 from src import ler_ficheiro_ps2, ler_ficheiros_ps2, converterParaPandas, validar_dados
 import sys
 
+# not used
+
 def main():    
 
     try:
